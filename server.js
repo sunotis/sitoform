@@ -26,8 +26,8 @@ const upload = multer({ storage: storage });
 
 // SFTP configuration for sitoform.com
 const sftpConfig = {
-  host: 'sitoform.com',
-  port: 22,
+  host: 'access-5013295760.ud-webspace.de', // Updated SFTP host
+  port: parseInt(process.env.SFTP_PORT) || 22,
   username: process.env.SFTP_USERNAME,
   password: process.env.SFTP_PASSWORD
 };
@@ -39,11 +39,21 @@ app.post('/api/upload-image', upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'No image file provided' });
     }
 
+    console.log('Attempting SFTP connection with config:', {
+      host: sftpConfig.host,
+      port: sftpConfig.port,
+      username: sftpConfig.username
+    });
+
     const sftp = new Client();
-    await sftp.connect(sftpConfig);
+    try {
+      await sftp.connect(sftpConfig);
+    } catch (connectError) {
+      throw new Error(`Failed to connect to SFTP server: ${connectError.message}`);
+    }
 
     const fileName = `${Date.now()}-${req.file.originalname}`;
-    const remotePath = `/public_html/images/${fileName}`; // Adjust based on your hosting structure
+    const remotePath = `/public_html/images/${fileName}`;
     await sftp.put(req.file.buffer, remotePath);
 
     await sftp.end();
@@ -52,7 +62,7 @@ app.post('/api/upload-image', upload.single('image'), async (req, res) => {
     res.json({ imageUrl });
   } catch (error) {
     console.error('Error uploading image:', error);
-    res.status(500).json({ error: 'Failed to upload image' });
+    res.status(500).json({ error: `Failed to upload image: ${error.message}` });
   }
 });
 
