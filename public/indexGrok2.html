@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Portfolio</title>
+  <!-- Tailwind CSS CDN for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Inter Font from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #343333;
+      color: white;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .artwork-section {
+      background-color: #343333;
+      height: 1060px;
+      width: 100%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .blue-line {
+      height: 3px;
+      background-color: #009FE3;
+      width: 1000px;
+      position: absolute;
+      bottom: 20;
+      left: 50%;
+      margin-top: 130px;
+      transform: translateX(-50%);
+      z-index: 10;
+    }
+    .vertical-line {
+      width: 2px;
+      height: 26px;
+      background-color: white;
+    }
+    .short-vertical-line {
+      width: 2px;
+      height: 30px;
+      background-color: white;
+      margin-right: 10px;
+    }
+    .metadata-group {
+      display: flex;
+      align-items: flex-start;
+    }
+    .metadata-group > div {
+      position: relative;
+    }
+    .number-align {
+      display: flex;
+      align-items: flex-end;
+      height: 26px;
+      margin-top: -12px;
+      margin-right: -5px;
+    }
+    .description-table {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      padding-left: 36px;
+    }
+    .description-table div {
+      flex: 1;
+    }
+    .description-table div:last-child {
+      margin-left: -12px;
+    }
+
+    /* Font Group CSS Classes */
+    .owner {
+      font-size: 14px;
+      font-weight: 700;
+      color: #575756;
+      line-height: 1;
+    }
+    .ownersub1 {
+      font-size: 14px;
+      font-weight: 300;
+      color: #575756;
+      line-height: 1;
+    }
+    .ownersub2 {
+      font-size: 14px;
+      font-weight: 200;
+      color: #575756;
+      line-height: 1;
+    }
+    .headerlinks {
+      font-size: 14px;
+      font-weight: 200;
+      color: white;
+    }
+    .artlink {
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+    }
+    .category {
+      font-size: 12px;
+      font-weight: 200;
+      line-height: 1;
+      margin-bottom: 7px;
+    }
+    .projectdata {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .description {
+      font-size: 14px;
+      font-weight: 300;
+      line-height: 1.5;
+      max-width: 433px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .blue-line {
+        width: 90%;
+      }
+      .header-content {
+        padding: 0 10px;
+      }
+      .logo {
+        width: 150px;
+        height: auto;
+      }
+      .header-text {
+        left: 200px !important;
+        font-size: 12px;
+      }
+      .nav-links {
+        left: 200px !important;
+        top: 60px !important;
+        font-size: 12px;
+      }
+      .art-link {
+        right: 10px !important;
+        font-size: 12px;
+      }
+      .metadata-section {
+        flex-direction: column;
+        padding: 0 10px;
+      }
+      .metadata-item {
+        width: 100% !important;
+        max-width: none !important;
+        margin-bottom: 20px;
+      }
+      .vertical-line {
+        display: none;
+      }
+      .description-table {
+        flex-direction: column;
+      }
+      .description-table div:last-child {
+        margin-left: 0;
+      }
+      .artwork-section {
+        height: 500px;
+      }
+      .artwork-display h1 {
+        font-size: 2rem;
+      }
+      .swipe-btn {
+        font-size: 1.5rem;
+      }
+      .owner, .ownersub1, .ownersub2, .headerlinks, .artlink, .projectdata, .description {
+        font-size: 12px;
+      }
+      .category {
+        font-size: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Section -->
+  <header class="w-full h-[133px] bg-[#343333] overflow-visible relative">
+    <div class="header-content max-w-[1000px] mx-auto relative">
+      <div class="logo absolute left-[40px] top-[18px]">
+        <img src="https://sitoform.com/logo/sito+RDA_logo01" alt="Logo" class="w-[210px] h-[75px]" />
+      </div>
+      <div class="header-text absolute left-[278px] top-[15px] leading-tight">
+        <p class="owner">SITO SCHWARZENBERGER</p>
+        <p class="ownersub1">RADIKAL DESIGN</p>
+        <p class="ownersub2">ALLIANCE</p>
+      </div>
+      <nav class="nav-links absolute left-[278px] top-[76px] flex space-x-2">
+        <a href="#" class="headerlinks hover:underline">BIOGRAPHY</a>
+        <a href="#" class="headerlinks hover:underline">CONTACT</a>
+        <a href="#" class="headerlinks hover:underline">VISUALS</a>
+      </nav>
+      <a href="#" class="art-link absolute right-[50px] top-[15px] artlink hover:underline">> ART</a>
+      <div class="blue-line"></div>
+    </div>
+  </header>
+
+  <!-- Metadata Section -->
+  <section class="w-full py-4 bg-[#343333]">
+    <div class="max-w-[1000px] mx-auto">
+      <!-- Metadata Row (3 columns) -->
+      <div class="metadata-section flex items-start">
+        <!-- Number -->
+        <div class="metadata-item w-[36px] text-right">
+          <p class="category invisible">PROJECT</p>
+          <div class="number-align">
+            <p id="artwork-number" class="projectdata">1</p>
+          </div>
+        </div>
+
+        <!-- Project -->
+        <div class="metadata-item flex-1 mr-[110px]">
+          <div class="metadata-group">
+            <div class="short-vertical-line mt-[2px]"></div>
+            <div>
+              <p class="category">PROJECT</p>
+              <p id="artwork-title" class="projectdata">CONNECTOLOGY</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Year -->
+        <div class="metadata-item w-[243px] mr-[110px]">
+          <div class="metadata-group">
+            <div class="short-vertical-line mt-[2px]"></div>
+            <div>
+              <p class="category">YEAR</p>
+              <p id="artwork-year" class="projectdata">2018 - NOW</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Type -->
+        <div class="metadata-item w-[243px]">
+          <div class="metadata-group">
+            <div class="short-vertical-line mt-[2px]"></div>
+            <div>
+              <p class="category">TYPE</p>
+              <p id="artwork-type" class="projectdata">LOGO</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Descriptions Row (2 columns) -->
+      <div class="description-table max-w-[1000px] mx-auto">
+        <div>
+          <p id="artwork-description-left" class="description">
+            Pfadfinderei beschreibt sich selbst als international agierendes Design Büro, das in jedem Fall “First Class Digital Shit” hervorbringt. Von der Produktion visueller Marketing Tools bis hin zur Visualisierung von Events, hat die Arbeit der Pfadfinderei eine Spannweite zu bieten, die die Grenzen zwischen funktionalem Design und avancierter Multimedia Kunst sprengen.
+          </p>
+        </div>
+        <div>
+          <p id="artwork-description-right" class="description">
+            zu etwas, die Pfadfinderei strukturiert in drei Hauptbereiche: Corporate Design, Produktion und Installation, größenwahnsinnige Passion der Pfadfinderei live Visualisierung von Musik (VJing) sowie die Konzeption multimedialer Rauminszenationen. Vom TV Studio zum Messestand bis hin zur Transformation von Bildern im und in den Raum.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Artwork Section -->
+  <section class="artwork-section">
+    <div class="max-w-[1000px] mx-auto text-center">
+      <div id="artwork-display" class="artwork-display">
+        <h1 class="text-6xl font-bold tracking-widest">CONNECTOLOGY</h1>
+      </div>
+      <!-- Swipe Controls -->
+      <button id="swipe-left" class="swipe-btn absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-2xl" disabled><</button>
+      <button id="swipe-right" class="swipe-btn absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-2xl">></button>
+    </div>
+  </section>
+
+  <!-- JavaScript for Swipe Functionality -->
+  <script>
+    const artworks = [
+      {
+        number: 1,
+        title: 'CONNECTOLOGY',
+        year: '2018 - NOW',
+        type: 'LOGO',
+        descriptionLeft: 'Pfadfinderei beschreibt sich selbst als international agierendes Design Büro, das in jedem Fall “First Class Digital Shit” hervorbringt. Von der Produktion visueller Marketing Tools bis hin zur Visualisierung von Events, hat die Arbeit der Pfadfinderei eine Spannweite zu bieten, die die Grenzen zwischen funktionalem Design und avancierter Multimedia Kunst sprengen.',
+        descriptionRight: 'zu etwas, die Pfadfinderei strukturiert in drei Hauptbereiche: Corporate Design, Produktion und Installation, größenwahnsinnige Passion der Pfadfinderei live Visualisierung von Musik (VJing) sowie die Konzeption multimedialer Rauminszenationen. Vom TV Studio zum Messestand bis hin zur Transformation von Bildern im und in den Raum.',
+        artwork: 'CONNECTOLOGY'
+      },
+      {
+        number: 2,
+        title: 'PROJECT TWO',
+        year: '2020 - NOW',
+        type: 'DESIGN',
+        descriptionLeft: 'This is a description for Project Two, showcasing another creative endeavor.',
+        descriptionRight: 'Additional details for Project Two, highlighting its unique aspects.',
+        artwork: 'PROJECT TWO'
+      }
+    ];
+
+    let currentIndex = 0;
+
+    // DOM elements
+    const artworkNumber = document.getElementById('artwork-number');
+    const artworkTitle = document.getElementById('artwork-title');
+    const artworkYear = document.getElementById('artwork-year');
+    const artworkType = document.getElementById('artwork-type');
+    const descriptionLeft = document.getElementById('artwork-description-left');
+    const descriptionRight = document.getElementById('artwork-description-right');
+    const artworkDisplay = document.getElementById('artwork-display');
+    const swipeLeftBtn = document.getElementById('swipe-left');
+    const swipeRightBtn = document.getElementById('swipe-right');
+
+    // Typewriter effect function
+    function typeWriter(element, text, speed = 100) {
+      element.textContent = ''; // Clear the element
+      let i = 0;
+      function type() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
+        }
+      }
+      type();
+    }
+
+    // Update UI with current artwork
+    function updateArtwork() {
+      const currentArtwork = artworks[currentIndex];
+
+      // Apply typewriter effect to projectdata elements
+      typeWriter(artworkNumber, currentArtwork.number.toString(), 100);
+      typeWriter(artworkTitle, currentArtwork.title, 100);
+      typeWriter(artworkYear, currentArtwork.year, 100);
+      typeWriter(artworkType, currentArtwork.type, 100);
+
+      // Update other elements without animation
+      descriptionLeft.textContent = currentArtwork.descriptionLeft;
+      descriptionRight.textContent = currentArtwork.descriptionRight;
+      artworkDisplay.innerHTML = `<h1 class="text-6xl font-bold tracking-widest">${currentArtwork.artwork}</h1>`;
+
+      // Update button states
+      swipeLeftBtn.disabled = currentIndex === 0;
+      swipeRightBtn.disabled = currentIndex === artworks.length - 1;
+    }
+
+    // Swipe functionality
+    swipeLeftBtn.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateArtwork();
+      }
+    });
+
+    swipeRightBtn.addEventListener('click', () => {
+      if (currentIndex < artworks.length - 1) {
+        currentIndex++;
+        updateArtwork();
+      }
+    });
+
+    // Initial render
+    updateArtwork();
+  </script>
+</body>
+</html>

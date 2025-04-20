@@ -1,0 +1,22 @@
+[
+    {
+      "number": 1,
+      "title": "CONNECTOLOGY",
+      "year": "2018 - NOW",
+      "type": "LOGO",
+      "descriptionLeft": "Pfadfinderei beschreibt sich selbst als international agierendes Design Büro, das in jedem Fall “First Class Digital Shit” hervorbringt. Von der Produktion visueller Marketing Tools bis hin zur Visualisierung von Events, hat die Arbeit der Pfadfinderei eine Spannweite zu bieten, die die Grenzen zwischen funktionalem Design und avancierter Multimedia Kunst sprengen.",
+      "descriptionRight": "zu etwas, die Pfadfinderei strukturiert in drei Hauptbereiche: Corporate Design, Produktion und Installation, größenwahnsinnige Passion der Pfadfinderei live Visualisierung von Musik (VJing) sowie die Konzeption multimedialer Rauminszenationen. Vom TV Studio zum Messestand bis hin zur Transformation von Bildern im und in den Raum.",
+      "artwork": "CONNECTOLOGY",
+      "imageUrl": "https://i.imgur.com/example-connectology.jpg"
+    },
+    {
+      "number": 2,
+      "title": "PROJECT TWO",
+      "year": "2020 - NOW",
+      "type": "DESIGN",
+      "descriptionLeft": "This is a description for Project Two, showcasing another creative endeavor.",
+      "descriptionRight": "Additional details for Project Two, highlighting its unique aspects.",
+      "artwork": "PROJECT TWO",
+      "imageUrl": "https://i.imgur.com/example-project-two.jpg"
+    }
+  ]
