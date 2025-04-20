@@ -69,7 +69,7 @@ app.post('/api/upload-image', upload.single('image'), async (req, res) => {
 
     await sftp.end();
 
-    const imageUrl = `https://sitoform.com/images/${fileName}`; // Updated public URL
+    const imageUrl = `https://sitoform.com/images/${fileName}`;
     res.json({ imageUrl });
   } catch (error) {
     console.error('Error uploading image:', error);
@@ -84,6 +84,49 @@ app.get('/api/artworks', async (req, res) => {
   } catch (error) {
     console.error('Error fetching artworks:', error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.delete('/api/artworks/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Fetch the artwork to get the imageurl
+    const { rows } = await pool.query('SELECT imageurl FROM artworks WHERE id = $1', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Artwork not found' });
+    }
+
+    const imageUrl = rows[0].imageurl;
+
+    // Delete the artwork from the database
+    const { rowCount } = await pool.query('DELETE FROM artworks WHERE id = $1', [id]);
+    if (rowCount === 0) {
+      return res.status(404).json({ error: 'Artwork not found' });
+    }
+
+    // Optionally, delete the image from the web server
+    if (imageUrl) {
+      try {
+        const sftp = new Client();
+        await sftp.connect(sftpConfig);
+
+        // Extract the file path from the imageUrl
+        const filePath = imageUrl.replace('https://sitoform.com', '/sitoform_com');
+        await sftp.delete(filePath);
+        console.log(`Deleted image: ${filePath}`);
+
+        await sftp.end();
+      } catch (sftpError) {
+        console.error('Error deleting image from SFTP:', sftpError);
+        // Continue even if image deletion fails
+      }
+    }
+
+    res.json({ message: 'Artwork deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting artwork:', error);
+    res.status(500).json({ error: 'Failed to delete artwork' });
   }
 });
 
