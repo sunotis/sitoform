@@ -16,20 +16,11 @@ const adminAuth = (req, res, next) => {
   next();
 };
 
-app.get('/test-db', async (req, res) => {
-    try {
-      const [rows] = await pool.query('SELECT 1 + 1 AS result');
-      res.json({ success: true, result: rows[0].result });
-    } catch (err) {
-      res.status(500).json({ success: false, error: err.message });
-    }
-  });
-
 // Get all artworks
 app.get('/api/artworks', async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM artworks');
-    res.json(rows);
+    const result = await pool.query('SELECT * FROM artworks');
+    res.json(result.rows);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal server error' });
@@ -40,12 +31,11 @@ app.get('/api/artworks', async (req, res) => {
 app.post('/api/artworks', adminAuth, async (req, res) => {
   const { title, description, imageUrl, project, year, type } = req.body;
   try {
-    const [result] = await pool.query(
-      'INSERT INTO artworks (title, description, imageUrl, project, year, type) VALUES (?, ?, ?, ?, ?, ?)',
+    const result = await pool.query(
+      'INSERT INTO artworks (title, description, imageUrl, project, year, type) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
       [title, description, imageUrl, project, year, type]
     );
-    const [newArtwork] = await pool.query('SELECT * FROM artworks WHERE id = ?', [result.insertId]);
-    res.json(newArtwork[0]);
+    res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to add artwork' });
@@ -57,12 +47,11 @@ app.put('/api/artworks/:id', adminAuth, async (req, res) => {
   const { id } = req.params;
   const { title, description, imageUrl, project, year, type } = req.body;
   try {
-    await pool.query(
-      'UPDATE artworks SET title = ?, description = ?, imageUrl = ?, project = ?, year = ?, type = ? WHERE id = ?',
+    const result = await pool.query(
+      'UPDATE artworks SET title = $1, description = $2, imageUrl = $3, project = $4, year = $5, type = $6 WHERE id = $7 RETURNING *',
       [title, description, imageUrl, project, year, type, id]
     );
-    const [updatedArtwork] = await pool.query('SELECT * FROM artworks WHERE id = ?', [id]);
-    res.json(updatedArtwork[0]);
+    res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to update artwork' });
@@ -73,7 +62,7 @@ app.put('/api/artworks/:id', adminAuth, async (req, res) => {
 app.delete('/api/artworks/:id', adminAuth, async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.query('DELETE FROM artworks WHERE id = ?', [id]);
+    await pool.query('DELETE FROM artworks WHERE id = $1', [id]);
     res.json({ message: 'Artwork deleted' });
   } catch (err) {
     console.error(err);
