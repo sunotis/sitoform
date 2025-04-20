@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Interface</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .artwork { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+    form { margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <h1>Admin Interface</h1>
+  <h2>Add New Artwork</h2>
+  <form id="add-artwork-form">
+    <input type="text" id="title" placeholder="Title" required><br>
+    <textarea id="description" placeholder="Description"></textarea><br>
+    <input type="text" id="imageUrl" placeholder="Image URL" required><br>
+    <button type="submit">Add Artwork</button>
+  </form>
+
+  <h2>Existing Artworks</h2>
+  <div id="artworks-list"></div>
+
+  <script>
+    const API_URL = 'https://portfolio-app.onrender.com/api/artworks'; // Replace with your Render URL
+
+    // Fetch and display artworks
+    async function loadArtworks() {
+      const response = await fetch(API_URL);
+      const artworks = await response.json();
+      const list = document.getElementById('artworks-list');
+      list.innerHTML = '';
+      artworks.forEach(artwork => {
+        const div = document.createElement('div');
+        div.className = 'artwork';
+        div.innerHTML = `
+          <h3>${artwork.title}</h3>
+          <p>${artwork.description || ''}</p>
+          <img src="${artwork.imageUrl}" alt="${artwork.title}" style="max-width: 200px;">
+          <br>
+          <button onclick="editArtwork(${artwork.id})">Edit</button>
+          <button onclick="deleteArtwork(${artwork.id})">Delete</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    // Add new artwork
+    document.getElementById('add-artwork-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      const imageUrl = document.getElementById('imageUrl').value;
+      await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description, imageUrl })
+      });
+      loadArtworks();
+      e.target.reset();
+    });
+
+    // Delete artwork
+    async function deleteArtwork(id) {
+      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      loadArtworks();
+    }
+
+    // Edit artwork (basic implementation)
+    async function editArtwork(id) {
+      const title = prompt('Enter new title:');
+      const description = prompt('Enter new description:');
+      const imageUrl = prompt('Enter new image URL:');
+      if (title && imageUrl) {
+        await fetch(`${API_URL}/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, description, imageUrl })
+        });
+        loadArtworks();
+      }
+    }
+
+    // Load artworks on page load
+    loadArtworks();
+  </script>
+</body>
+</html>
