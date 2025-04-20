@@ -1,11 +1,22 @@
 const express = require('express');
 const cors = require('cors');
-const pool = require('./db');
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
+    host: new URL(process.env.DATABASE_URL).hostname, // Extract host explicitly
+    dialectOptions: {
+      preferIPv4: true // Force IPv4
+    }
+  });
+  
 const app = express();
+
 
 app.use(cors({ origin: 'https://sitoform.com' }));
 app.use(express.json());
 app.use(express.static('public'));
+
+
 
 // Basic authentication middleware (for demo purposes)
 const adminAuth = (req, res, next) => {
