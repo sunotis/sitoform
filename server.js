@@ -9,13 +9,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const url = new URL(process.env.DATABASE_URL);
 const pool = new Pool({
-  user: url.username,
-  password: url.password,
-  host: url.hostname,
-  port: url.port,
-  database: url.pathname.split('/')[1],
+  user: process.env.DB_USERNAME || 'postgres.ydfkrwjafnuvdvezpkcp',
+  password: process.env.DB_PASSWORD,
+  host: process.env.DB_HOST || 'aws-0-us-east-1.pooler.supabase.com',
+  port: parseInt(process.env.DB_PORT) || 6543,
+  database: process.env.DB_NAME || 'postgres',
   ssl: { rejectUnauthorized: false },
   family: 4
 });
@@ -24,9 +23,9 @@ const pool = new Pool({
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// SFTP configuration for sitoform.com
+// SFTP configuration
 const sftpConfig = {
-  host: 'access-5013295760.ud-webspace.de', // Updated SFTP host
+  host: process.env.SFTP_HOST || 'access-5013295760.ud-webspace.de',
   port: parseInt(process.env.SFTP_PORT) || 22,
   username: process.env.SFTP_USERNAME,
   password: process.env.SFTP_PASSWORD
@@ -52,13 +51,24 @@ app.post('/api/upload-image', upload.single('image'), async (req, res) => {
       throw new Error(`Failed to connect to SFTP server: ${connectError.message}`);
     }
 
+    // Ensure the /sitoform_com/images directory exists
+    const remoteDir = '/sitoform_com/images'; // Updated path
+    try {
+      await sftp.mkdir(remoteDir, true); // true allows recursive creation
+      console.log(`Directory ${remoteDir} created or already exists`);
+    } catch (mkdirError) {
+      if (mkdirError.code !== 'EEXIST') { // Ignore if directory already exists
+        throw new Error(`Failed to create directory ${remoteDir}: ${mkdirError.message}`);
+      }
+    }
+
     const fileName = `${Date.now()}-${req.file.originalname}`;
-    const remotePath = `/public_html/images/${fileName}`;
+    const remotePath = `${remoteDir}/${fileName}`;
     await sftp.put(req.file.buffer, remotePath);
 
     await sftp.end();
 
-    const imageUrl = `https://sitoform.com/images/${fileName}`;
+    const imageUrl = `https://sitoform.com/images/${fileName}`; // Ensure this URL matches the public path
     res.json({ imageUrl });
   } catch (error) {
     console.error('Error uploading image:', error);
