@@ -1,26 +1,78 @@
 const express = require('express');
-const path = require('path');
-const fs = require('fs');
-
+const cors = require('cors');
+const pool = require('./db');
 const app = express();
-const PORT = process.env.PORT || 3000; // Use Render's assigned port or default to 3000
 
-// Serve static files from the "public" directory
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors({ origin: 'https://sitoform.com' }));
+app.use(express.json());
+app.use(express.static('public'));
 
-// API endpoint to get artworks
-app.get('/api/artworks', (req, res) => {
-  fs.readFile(path.join(__dirname, 'data', 'artworks.json'), 'utf8', (err, data) => {
-    if (err) {
-      console.error('Error reading artworks.json:', err);
-      res.status(500).json({ error: 'Failed to load artworks' });
-      return;
-    }
-    res.json(JSON.parse(data));
-  });
+// Basic authentication middleware (for demo purposes)
+const adminAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || authHeader !== 'Bearer my-secret-token') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+};
+
+// Get all artworks
+app.get('/api/artworks', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM artworks');
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// Add a new artwork
+app.post('/api/artworks', adminAuth, async (req, res) => {
+  const { title, description, imageUrl } = req.body;
+  try {
+    const [result] = await pool.query(
+      'INSERT INTO artworks (title, description, imageUrl) VALUES (?, ?, ?)',
+      [title, description, imageUrl]
+    );
+    const [newArtwork] = await pool.query('SELECT * FROM artworks WHERE id = ?', [result.insertId]);
+    res.json(newArtwork[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to add artwork' });
+  }
+});
+
+// Update an artwork
+app.put('/api/artworks/:id', adminAuth, async (req, res) => {
+  const { id } = req.params;
+  const { title, description, imageUrl } = req.body;
+  try {
+    await pool.query(
+      'UPDATE artworks SET title = ?, description = ?, imageUrl = ? WHERE id = ?',
+      [title, description, imageUrl, id]
+    );
+    const [updatedArtwork] = await pool.query('SELECT * FROM artworks WHERE id = ?', [id]);
+    res.json(updatedArtwork[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update artwork' });
+  }
+});
+
+// Delete an artwork
+app.delete('/api/artworks/:id', adminAuth, async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('DELETE FROM artworks WHERE id = ?', [id]);
+    res.json({ message: 'Artwork deleted' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to delete artwork' });
+  }
+});
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
