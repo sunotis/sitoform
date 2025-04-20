@@ -9,28 +9,24 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Database connection using DATABASE_URL
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
 
-// Test database connection on startup
 pool.connect((err, client, release) => {
   if (err) {
     console.error('Error connecting to database:', err.stack);
-    process.exit(1); // Exit if database connection fails
+    process.exit(1);
   } else {
     console.log('Database connection successful');
     release();
   }
 });
 
-// Multer setup for file uploads
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// SFTP configuration
 const sftpConfig = {
   host: process.env.SFTP_HOST || 'access-5013295760.ud-webspace.de',
   port: parseInt(process.env.SFTP_PORT) || 22,
@@ -38,7 +34,6 @@ const sftpConfig = {
   password: process.env.SFTP_PASSWORD
 };
 
-// Endpoint to upload image and return URL
 app.post('/api/upload-image', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
@@ -74,7 +69,7 @@ app.post('/api/upload-image', upload.single('image'), async (req, res) => {
 
     await sftp.end();
 
-    const imageUrl = `https://sitoform.com/images/${fileName}`;
+    const imageUrl = `https://sitoform.com/sitoform_com/images/${fileName}`; // Updated public URL
     res.json({ imageUrl });
   } catch (error) {
     console.error('Error uploading image:', error);
