@@ -1,21 +1,21 @@
 const express = require('express');
+const { Pool } = require('pg'); // Add this import
 const cors = require('cors');
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
-    host: new URL(process.env.DATABASE_URL).hostname, // Extract host explicitly
-    dialectOptions: {
-      preferIPv4: true // Force IPv4
-    }
-  });
-  
 const app = express();
 
-
-app.use(cors({ origin: 'https://sitoform.com' }));
+app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
 
+const url = new URL(process.env.DATABASE_URL);
+const pool = new Pool({
+  user: url.username,
+  password: url.password,
+  host: url.hostname,
+  port: url.port,
+  database: url.pathname.split('/')[1],
+  ssl: { rejectUnauthorized: false },
+  family: 4 // Force IPv4
+});
 
 
 // Basic authentication middleware (for demo purposes)
