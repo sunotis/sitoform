@@ -9,14 +9,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Database connection using DATABASE_URL
 const pool = new Pool({
-  user: process.env.DB_USERNAME || 'postgres.ydfkrwjafnuvdvezpkcp',
-  password: process.env.DB_PASSWORD,
-  host: process.env.DB_HOST || 'aws-0-us-east-1.pooler.supabase.com',
-  port: parseInt(process.env.DB_PORT) || 6543,
-  database: process.env.DB_NAME || 'postgres',
-  ssl: { rejectUnauthorized: false },
-  family: 4
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
+
+// Test database connection on startup
+pool.connect((err, client, release) => {
+  if (err) {
+    console.error('Error connecting to database:', err.stack);
+    process.exit(1); // Exit if database connection fails
+  } else {
+    console.log('Database connection successful');
+    release();
+  }
 });
 
 // Multer setup for file uploads
@@ -51,13 +58,12 @@ app.post('/api/upload-image', upload.single('image'), async (req, res) => {
       throw new Error(`Failed to connect to SFTP server: ${connectError.message}`);
     }
 
-    // Ensure the /sitoform_com/images directory exists
-    const remoteDir = '/sitoform_com/images'; // Updated path
+    const remoteDir = '/sitoform_com/images';
     try {
-      await sftp.mkdir(remoteDir, true); // true allows recursive creation
+      await sftp.mkdir(remoteDir, true);
       console.log(`Directory ${remoteDir} created or already exists`);
     } catch (mkdirError) {
-      if (mkdirError.code !== 'EEXIST') { // Ignore if directory already exists
+      if (mkdirError.code !== 'EEXIST') {
         throw new Error(`Failed to create directory ${remoteDir}: ${mkdirError.message}`);
       }
     }
@@ -68,7 +74,7 @@ app.post('/api/upload-image', upload.single('image'), async (req, res) => {
 
     await sftp.end();
 
-    const imageUrl = `https://sitoform.com/images/${fileName}`; // Ensure this URL matches the public path
+    const imageUrl = `https://sitoform.com/images/${fileName}`;
     res.json({ imageUrl });
   } catch (error) {
     console.error('Error uploading image:', error);
