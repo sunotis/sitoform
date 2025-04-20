@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio</title>
+  <style>
+    body {
+      background-color: #343333;
+      color: white;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .artwork { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+    
+    .artwork-section {
+      background-color: #343333;
+      height: 1060px;
+      width: 100%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .artwork-display img {
+      max-width: 100%;
+      max-height: 80vh;
+      object-fit: contain;
+    }
+    .blue-line {
+      height: 3px;
+      background-color: #009FE3;
+      width: 1000px;
+      position: absolute;
+      bottom: 20;
+      left: 50%;
+      margin-top: 130px;
+      transform: translateX(-50%);
+      z-index: 10;
+    }
+    .vertical-line {
+      width: 2px;
+      height: 26px;
+      background-color: white;
+    }
+    .short-vertical-line {
+      width: 2px;
+      height: 30px;
+      background-color: white;
+      margin-right: 10px;
+    }
+    .metadata-group {
+      display: flex;
+      align-items: flex-start;
+    }
+    .metadata-group > div {
+      position: relative;
+    }
+    .number-align {
+      display: flex;
+      align-items: flex-end;
+      height: 26px;
+      margin-top: -12px;
+      margin-right: -5px;
+    }
+    .description-table {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      padding-left: 36px;
+    }
+    .description-table div {
+      flex: 1;
+    }
+    .description-table div:last-child {
+      margin-left: -12px;
+    }
+
+    /* Font Group CSS Classes */
+    .owner {
+      font-size: 14px;
+      font-weight: 700;
+      color: #575756;
+      line-height: 1;
+    }
+    .ownersub1 {
+      font-size: 14px;
+      font-weight: 300;
+      color: #575756;
+      line-height: 1;
+    }
+    .ownersub2 {
+      font-size: 14px;
+      font-weight: 200;
+      color: #575756;
+      line-height: 1;
+    }
+    .headerlinks {
+      font-size: 14px;
+      font-weight: 200;
+      color: white;
+    }
+    .artlink {
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+    }
+    .category {
+      font-size: 12px;
+      font-weight: 200;
+      line-height: 1;
+      margin-bottom: 7px;
+    }
+    .projectdata {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .description {
+      font-size: 14px;
+      font-weight: 300;
+      line-height: 1.5;
+      max-width: 433px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .blue-line {
+        width: 90%;
+      }
+      .header-content {
+        padding: 0 10px;
+      }
+      .logo {
+        width: 150px;
+        height: auto;
+      }
+      .header-text {
+        left: 200px !important;
+        font-size: 12px;
+      }
+      .nav-links {
+        left: 200px !important;
+        top: 60px !important;
+        font-size: 12px;
+      }
+      .art-link {
+        right: 10px !important;
+        font-size: 12px;
+      }
+      .metadata-section {
+        flex-direction: column;
+        padding: 0 10px;
+      }
+      .metadata-item {
+        width: 100% !important;
+        max-width: none !important;
+        margin-bottom: 20px;
+      }
+      .vertical-line {
+        display: none;
+      }
+      .description-table {
+        flex-direction: column;
+      }
+      .description-table div:last-child {
+        margin-left: 0;
+      }
+      .artwork-section {
+        height: 500px;
+      }
+      .artwork-display img {
+        max-height: 50vh;
+      }
+      .swipe-btn {
+        font-size: 1.5rem;
+      }
+      .owner, .ownersub1, .ownersub2, .headerlinks, .artlink, .projectdata, .description {
+        font-size: 12px;
+      }
+      .category {
+        font-size: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>My Portfolio</h1>
+  <div id="artworks-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    const supabaseUrl = 'https://ydfkrwjafnuvdvezpkcp.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkZmtyd2phZm51dmR2ZXpwa2NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxNzA0MTUsImV4cCI6MjA2MDc0NjQxNX0.kHzI8KRGFBRrLpFVvJfK2JP_P2a9nRJzDBm5h235eJw';
+    const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+    async function loadArtworks() {
+      const container = document.getElementById('artworks-container');
+      try {
+        // Try fetching from Supabase
+        const { data: artworks, error } = await supabase
+          .from('artworks')
+          .select('*');
+        
+        if (error) throw error;
+
+        if (artworks.length === 0) {
+          container.innerHTML = '<p>No artworks found.</p>';
+          return;
+        }
+
+        artworks.forEach(artwork => {
+          const div = document.createElement('div');
+          div.className = 'artwork';
+          div.innerHTML = `
+            <h3>${artwork.title}</h3>
+            <p>${artwork.description || ''}</p>
+            <p>Project: ${artwork.project || 'N/A'}</p>
+            <p>Year: ${artwork.year || 'N/A'}</p>
+            <p>Type: ${artwork.type || 'N/A'}</p>
+            <img src="${artwork.imageUrl}" alt="${artwork.title}" style="max-width: 200px;">
+          `;
+          container.appendChild(div);
+        });
+      } catch (error) {
+        console.error('Error fetching from Supabase:', error);
+        // Fallback to artworks.json
+        fetch('https://sitoform.com/data/artworks.json')
+          .then(response => response.json())
+          .then(artworks => {
+            if (artworks.length === 0) {
+              container.innerHTML = '<p>No artworks found (fallback).</p>';
+              return;
+            }
+            artworks.forEach(artwork => {
+              const div = document.createElement('div');
+              div.className = 'artwork';
+              div.innerHTML = `
+                <h3>${artwork.title}</h3>
+                <p>${artwork.description || ''}</p>
+                <p>Project: ${artwork.project || 'N/A'}</p>
+                <p>Year: ${artwork.year || 'N/A'}</p>
+                <p>Type: ${artwork.type || 'N/A'}</p>
+                <img src="${artwork.imageUrl}" alt="${artwork.title}" style="max-width: 200px;">
+              `;
+              container.appendChild(div);
+            });
+          })
+          .catch(fallbackError => {
+            console.error('Error fetching fallback artworks.json:', fallbackError);
+            container.innerHTML = '<p>Error loading artworks.</p>';
+          });
+      }
+    }
+
+    loadArtworks();
+  </script>
+</body>
+</html>
