@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Portfolio</title>
-  <!-- Tailwind CSS CDN for styling -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Load the local Tailwind CSS file -->
+  <link href="/css/output.css" rel="stylesheet">
   <!-- Inter Font from Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;700&display=swap" rel="stylesheet">
   <style>
@@ -78,7 +78,6 @@
     .description-table div:last-child {
       margin-left: -12px;
     }
-
     /* Font Group CSS Classes */
     .owner {
       font-size: 14px;
@@ -125,7 +124,6 @@
       line-height: 1.5;
       max-width: 433px;
     }
-
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .blue-line {
@@ -300,7 +298,7 @@
     // Supabase client
     const supabaseUrl = 'https://ydfkrwjafnuvdvezpkcp.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkZmtyd2phZm51dmR2ZXpwa2NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxNzA0MTUsImV4cCI6MjA2MDc0NjQxNX0.kHzI8KRGFBRrLpFVvJfK2JP_P2a9nRJzDBm5h235eJw';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey); // Renamed to supabaseClient
 
     // Typewriter effect function
     function typeWriter(element, text, speed = 100) {
@@ -333,7 +331,7 @@
 
       // Apply typewriter effect to projectdata elements
       typeWriter(artworkNumber, currentArtwork.number.toString(), 100);
-      typeWriter(artworkTitle, currentArtwork.project || 'N/A', 100); // Map 'project' to 'title' in UI
+      typeWriter(artworkTitle, currentArtwork.project || 'N/A', 100);
       typeWriter(artworkYear, currentArtwork.year?.toString() || 'N/A', 100);
       typeWriter(artworkType, currentArtwork.type || 'N/A', 100);
 
@@ -356,7 +354,7 @@
     async function fetchArtworks() {
       try {
         // Fetch from Supabase
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
           .from('artworks')
           .select('*')
           .order('id', { ascending: true });
