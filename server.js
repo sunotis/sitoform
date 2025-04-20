@@ -69,7 +69,7 @@ app.post('/api/upload-image', upload.single('image'), async (req, res) => {
 
     await sftp.end();
 
-    const imageUrl = `https://sitoform.com/sitoform_com/images/${fileName}`; // Updated public URL
+    const imageUrl = `https://sitoform.com/images/${fileName}`; // Updated public URL
     res.json({ imageUrl });
   } catch (error) {
     console.error('Error uploading image:', error);
