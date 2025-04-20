@@ -333,22 +333,23 @@
     }
 
     // Fetch artworks from the backend
-    async function fetchArtworks() {
-      try {
-        const response = await fetch('/api/artworks');
-        if (!response.ok) {
-          throw new Error('Failed to fetch artworks');
-        }
-        artworks = await response.json();
-        if (artworks.length > 0) {
-          updateArtwork(); // Render the first artwork
-        } else {
-          console.error('No artworks found');
-        }
-      } catch (error) {
-        console.error('Error fetching artworks:', error);
-      }
-    }
+    fetch('https://sitoform25.onrender.com/api/artworks')
+  .then(response => response.json())
+  .then(artworks => {
+    const container = document.getElementById('artworks-container'); // Replace with your container ID
+    artworks.forEach(artwork => {
+      const div = document.createElement('div');
+      div.innerHTML = `
+        <h3>${artwork.title}</h3>
+        <p>${artwork.description || ''}</p>
+        <p>Project: ${artwork.project || 'N/A'}</p>
+        <p>Year: ${artwork.year || 'N/A'}</p>
+        <p>Type: ${artwork.type || 'N/A'}</p>
+        <img src="${artwork.imageUrl}" alt="${artwork.title}">
+      `;
+      container.appendChild(div);
+    });
+  });
 
     // Swipe functionality
     swipeLeftBtn.addEventListener('click', () => {

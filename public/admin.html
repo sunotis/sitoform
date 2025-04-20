@@ -17,6 +17,9 @@
     <input type="text" id="title" placeholder="Title" required><br>
     <textarea id="description" placeholder="Description"></textarea><br>
     <input type="text" id="imageUrl" placeholder="Image URL" required><br>
+    <input type="text" id="project" placeholder="Project"><br>
+    <input type="number" id="year" placeholder="Year"><br>
+    <input type="text" id="type" placeholder="Type"><br>
     <button type="submit">Add Artwork</button>
   </form>
 
@@ -24,11 +27,13 @@
   <div id="artworks-list"></div>
 
   <script>
-    const API_URL = 'https://portfolio-app.onrender.com/api/artworks'; // Replace with your Render URL
+    const API_URL = 'https://sitoform25.onrender.com/api/artworks'; // Replace with your Render URL
+    const TOKEN = 'my-secret-token';
 
-    // Fetch and display artworks
     async function loadArtworks() {
-      const response = await fetch(API_URL);
+      const response = await fetch(API_URL, {
+        headers: { 'Authorization': `Bearer ${TOKEN}` }
+      });
       const artworks = await response.json();
       const list = document.getElementById('artworks-list');
       list.innerHTML = '';
@@ -38,6 +43,9 @@
         div.innerHTML = `
           <h3>${artwork.title}</h3>
           <p>${artwork.description || ''}</p>
+          <p>Project: ${artwork.project || 'N/A'}</p>
+          <p>Year: ${artwork.year || 'N/A'}</p>
+          <p>Type: ${artwork.type || 'N/A'}</p>
           <img src="${artwork.imageUrl}" alt="${artwork.title}" style="max-width: 200px;">
           <br>
           <button onclick="editArtwork(${artwork.id})">Edit</button>
@@ -47,43 +55,54 @@
       });
     }
 
-    // Add new artwork
     document.getElementById('add-artwork-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const title = document.getElementById('title').value;
       const description = document.getElementById('description').value;
       const imageUrl = document.getElementById('imageUrl').value;
+      const project = document.getElementById('project').value;
+      const year = document.getElementById('year').value;
+      const type = document.getElementById('type').value;
       await fetch(API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description, imageUrl })
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${TOKEN}`
+        },
+        body: JSON.stringify({ title, description, imageUrl, project, year, type })
       });
       loadArtworks();
       e.target.reset();
     });
 
-    // Delete artwork
     async function deleteArtwork(id) {
-      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      await fetch(`${API_URL}/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${TOKEN}` }
+      });
       loadArtworks();
     }
 
-    // Edit artwork (basic implementation)
     async function editArtwork(id) {
-      const title = prompt('Enter new title:');
-      const description = prompt('Enter new description:');
-      const imageUrl = prompt('Enter new image URL:');
+      const title = prompt('Enter new title:', '');
+      const description = prompt('Enter new description:', '');
+      const imageUrl = prompt('Enter new image URL:', '');
+      const project = prompt('Enter new project:', '');
+      const year = prompt('Enter new year:', '');
+      const type = prompt('Enter new type:', '');
       if (title && imageUrl) {
         await fetch(`${API_URL}/${id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, description, imageUrl })
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${TOKEN}`
+          },
+          body: JSON.stringify({ title, description, imageUrl, project, year, type })
         });
         loadArtworks();
       }
     }
 
-    // Load artworks on page load
     loadArtworks();
   </script>
 </body>
