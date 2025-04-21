@@ -24,7 +24,6 @@ pool.connect((err, client, release) => {
   }
 });
 
-// Supabase client for verifying JWT
 const supabaseUrl = 'https://ydfkrwjafnuvdvezpkcp.supabase.co';
 const supabaseKey = process.env.SUPABASE_KEY;
 if (!supabaseKey) {
@@ -32,69 +31,139 @@ if (!supabaseKey) {
 }
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
-const sftpConfig = {
-  host: process.env.SFTP_HOST || 'access-5013295760.ud-webspace.de',
-  port: parseInt(process.env.SFTP_PORT) || 22,
-  username: process.env.SFTP_USERNAME,
-  password: process.env.SFTP_PASSWORD
-};
-
-app.post('/api/upload-image', upload.single('image'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No image file provided' });
-    }
-
-    console.log('Attempting SFTP connection with config:', {
-      host: sftpConfig.host,
-      port: sftpConfig.port,
-      username: sftpConfig.username
-    });
-
-    const sftp = new Client();
-    try {
-      await sftp.connect(sftpConfig);
-    } catch (connectError) {
-      throw new Error(`Failed to connect to SFTP server: ${connectError.message}`);
-    }
-
-    const remoteDir = '/sitoform_com/images';
-    try {
-      await sftp.mkdir(remoteDir, true);
-      console.log(`Directory ${remoteDir} created or already exists`);
-    } catch (mkdirError) {
-      if (mkdirError.code !== 'EEXIST') {
-        throw new Error(`Failed to create directory ${remoteDir}: ${mkdirError.message}`);
-      }
-    }
-
-    const fileName = `${Date.now()}-${req.file.originalname}`;
-    const remotePath = `${remoteDir}/${fileName}`;
-    await sftp.put(req.file.buffer, remotePath);
-
-    await sftp.end();
-
-    const imageUrl = `https://sitoform.com/images/${fileName}`;
-    res.json({ imageUrl });
-  } catch (error) {
-    console.error('Error uploading image:', error);
-    res.status(500).json({ error: `Failed to upload image: ${error.message}` });
-  }
-});
-
+// GET /api/artworks (fetch sorted by order)
 app.get('/api/artworks', async (req, res) => {
   try {
-    const { rows } = await pool.query('SELECT * FROM artworks ORDER BY id ASC');
-    res.json(rows);
+    const { data, error } = await supabaseClient
+      .from('artworks')
+      .select('*')
+      .order('order', { ascending: true });
+    if (error) throw error;
+    res.json(data);
   } catch (error) {
     console.error('Error fetching artworks:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Failed to fetch artworks' });
   }
 });
 
+// PATCH /api/artworks/:id (edit project)
+app.patch('/api/artworks/:id', async (req, res) => {
+  const { id } = req.params;
+  const { title, project, year, type, description, imageurl } = req.body;
+  const token = req.headers.authorization?.split('Bearer ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  try {
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+
+    const updates = {};
+    if (title) updates.title = title;
+    if (project) updates.project = project;
+    if (year) updates.year = year;
+    if (type) updates.type = type;
+    if (description) updates.description = description;
+    if (imageurl) updates.imageurl = imageurl;
+
+    const { error } = await supabaseClient
+      .from('artworks')
+      .update(updates)
+      .eq('id', id);
+    if (error) throw error;
+
+    res.json({ message: 'Artwork updated successfully' });
+  } catch (error) {
+    console.error('Error updating artwork:', error);
+    res.status(500).json({ error: 'Failed to update artwork' });
+  }
+});
+
+// PATCH /api/artworks/reorder (update order)
+app.patch('/api/artworks/reorder', async (req, res) => {
+  const { order } = req.body; // Array of { id, order }
+  const token = req.headers.authorization?.split('Bearer ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  try {
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+
+    for (const { id, order: newOrder } of order) {
+      const { error } = await supabaseClient
+        .from('artworks')
+        .update({ order: newOrder })
+        .eq('id', id);
+      if (error) throw error;
+    }
+
+    res.json({ message: 'Order updated successfully' });
+  } catch (error) {
+    console.error('Error updating order:', error);
+    res.status(500).json({ error: 'Failed to update order' });
+  }
+});
+
+// Existing POST /api/artworks (unchanged, but ensure order is set)
+app.post('/api/artworks', multer().single('image'), async (req, res) => {
+  const { title, project, year, type, description } = req.body;
+  const token = req.headers.authorization?.split('Bearer ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  try {
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+
+    let imageurl = '';
+    if (req.file) {
+      const sftp = new Client();
+      await sftp.connect({
+        host: process.env.SFTP_HOST,
+        port: process.env.SFTP_PORT,
+        username: process.env.SFTP_USERNAME,
+        password: process.env.SFTP_PASSWORD
+      });
+      const remotePath = `/sitoform_com/images/${req.file.originalname}`;
+      await sftp.put(req.file.buffer, remotePath);
+      await sftp.end();
+      imageurl = `https://sitoform.com/images/${req.file.originalname}`;
+    }
+
+    // Get max order and set new order as max + 1
+    const { data: maxOrderData } = await supabaseClient
+      .from('artworks')
+      .select('order')
+      .order('order', { ascending: false })
+      .limit(1);
+    const newOrder = maxOrderData?.[0]?.order ? maxOrderData[0].order + 1 : 1;
+
+    const { error } = await supabaseClient
+      .from('artworks')
+      .insert([{ title, project, year, type, description, imageurl, order: newOrder }]);
+    if (error) throw error;
+
+    res.json({ message: 'Artwork uploaded successfully', imageurl });
+  } catch (error) {
+    console.error('Error uploading artwork:', error);
+    res.status(500).json({ error: 'Failed to upload artwork' });
+  }
+});
+
+// Existing DELETE /api/artworks/:id (unchanged)
 app.delete('/api/artworks/:id', async (req, res) => {
   const { id } = req.params;
   const token = req.headers.authorization?.split('Bearer ')[1];
@@ -104,42 +173,35 @@ app.delete('/api/artworks/:id', async (req, res) => {
   }
 
   try {
-    // Verify JWT token
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
     if (authError || !user) {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
 
-    // Fetch the artwork to get the imageurl
-    const { rows } = await pool.query('SELECT imageurl FROM artworks WHERE id = $1', [id]);
-    if (rows.length === 0) {
-      return res.status(404).json({ error: 'Artwork not found' });
-    }
+    const { data: artwork, error: fetchError } = await supabaseClient
+      .from('artworks')
+      .select('imageurl')
+      .eq('id', id)
+      .single();
+    if (fetchError) throw fetchError;
 
-    const imageUrl = rows[0].imageurl;
+    const { error } = await supabaseClient
+      .from('artworks')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
 
-    // Delete the artwork from the database
-    const { rowCount } = await pool.query('DELETE FROM artworks WHERE id = $1', [id]);
-    if (rowCount === 0) {
-      return res.status(404).json({ error: 'Artwork not found' });
-    }
-
-    // Optionally, delete the image from the web server
-    if (imageUrl) {
-      try {
-        const sftp = new Client();
-        await sftp.connect(sftpConfig);
-
-        // Extract the file path from the imageUrl
-        const filePath = imageUrl.replace('https://sitoform.com', '/sitoform_com');
-        await sftp.delete(filePath);
-        console.log(`Deleted image: ${filePath}`);
-
-        await sftp.end();
-      } catch (sftpError) {
-        console.error('Error deleting image from SFTP:', sftpError);
-        // Continue even if image deletion fails
-      }
+    if (artwork.imageurl) {
+      const filename = artwork.imageurl.split('/').pop();
+      const sftp = new Client();
+      await sftp.connect({
+        host: process.env.SFTP_HOST,
+        port: process.env.SFTP_PORT,
+        username: process.env.SFTP_USERNAME,
+        password: process.env.SFTP_PASSWORD
+      });
+      await sftp.delete(`/sitoform_com/images/${filename}`);
+      await sftp.end();
     }
 
     res.json({ message: 'Artwork deleted successfully' });
@@ -150,6 +212,4 @@ app.delete('/api/artworks/:id', async (req, res) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
+app.listen(port, () => console.log(`Server running on port ${port}`));
