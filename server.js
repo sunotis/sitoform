@@ -26,7 +26,10 @@ pool.connect((err, client, release) => {
 
 // Supabase client for verifying JWT
 const supabaseUrl = 'https://ydfkrwjafnuvdvezpkcp.supabase.co';
-const supabaseKey = process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkZmtyd2phZm51dmR2ZXpwa2NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxNzA0MTUsImV4cCI6MjA2MDc0NjQxNX0.kHzI8KRGFBRrLpFVvJfK2JP_P2a9nRJzDBm5h235eJw';
+const supabaseKey = process.env.SUPABASE_KEY;
+if (!supabaseKey) {
+  throw new Error('SUPABASE_KEY environment variable is not set');
+}
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 const storage = multer.memoryStorage();
