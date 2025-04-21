@@ -31,6 +31,7 @@ if (!supabaseKey) {
 }
 const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
+
 // GET /api/artworks (fetch sorted by order)
 app.get('/api/artworks', async (req, res) => {
   try {
@@ -115,53 +116,68 @@ app.patch('/api/artworks/reorder', async (req, res) => {
 
 // Existing POST /api/artworks (unchanged, but ensure order is set)
 app.post('/api/artworks', multer().single('image'), async (req, res) => {
-  const { title, project, year, type, description } = req.body;
-  const token = req.headers.authorization?.split('Bearer ')[1];
-
-  if (!token) {
-    return res.status(401).json({ error: 'No token provided' });
-  }
-
-  try {
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
-    if (authError || !user) {
-      return res.status(401).json({ error: 'Invalid or expired token' });
+    const { title, project, year, type, description } = req.body;
+    const token = req.headers.authorization?.split('Bearer ')[1];
+  
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
     }
-
-    let imageurl = '';
-    if (req.file) {
-      const sftp = new Client();
-      await sftp.connect({
-        host: process.env.SFTP_HOST,
-        port: process.env.SFTP_PORT,
-        username: process.env.SFTP_USERNAME,
-        password: process.env.SFTP_PASSWORD
-      });
-      const remotePath = `/sitoform_com/images/${req.file.originalname}`;
-      await sftp.put(req.file.buffer, remotePath);
-      await sftp.end();
-      imageurl = `https://sitoform.com/images/${req.file.originalname}`;
+  
+    try {
+      const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
+      if (authError || !user) {
+        return res.status(401).json({ error: 'Invalid or expired token' });
+      }
+  
+      let imageurl = '';
+      if (req.file) {
+        const sftp = new Client();
+        try {
+          console.log('Connecting to SFTP:', {
+            host: process.env.SFTP_HOST,
+            port: process.env.SFTP_PORT,
+            username: process.env.SFTP_USERNAME
+          }); // Debug: Log SFTP config (excluding password)
+          await sftp.connect({
+            host: process.env.SFTP_HOST,
+            port: parseInt(process.env.SFTP_PORT) || 22, // Ensure port is a number, default to 22
+            username: process.env.SFTP_USERNAME,
+            password: process.env.SFTP_PASSWORD,
+            retries: 3, // Retry connection up to 3 times
+            readyTimeout: 10000 // 10s timeout
+          });
+          const remotePath = `/sitoform_com/images/${req.file.originalname}`;
+          console.log('Uploading to SFTP:', remotePath); // Debug
+          await sftp.put(req.file.buffer, remotePath);
+          imageurl = `https://sitoform.com/images/${req.file.originalname}`;
+          console.log('SFTP upload successful:', imageurl); // Debug
+          await sftp.end();
+        } catch (sftpError) {
+          console.error('SFTP error:', sftpError);
+          await sftp.end().catch(() => {}); // Ensure SFTP connection closes
+          return res.status(500).json({ error: `Failed to upload image to SFTP: ${sftpError.message}` });
+        }
+      }
+  
+      // Get max order and set new order as max + 1
+      const { data: maxOrderData } = await supabaseClient
+        .from('artworks')
+        .select('order')
+        .order('order', { ascending: false })
+        .limit(1);
+      const newOrder = maxOrderData?.[0]?.order ? maxOrderData[0].order + 1 : 1;
+  
+      const { error } = await supabaseClient
+        .from('artworks')
+        .insert([{ title, project, year, type, description, imageurl, order: newOrder }]);
+      if (error) throw error;
+  
+      res.json({ message: 'Artwork uploaded successfully', imageurl });
+    } catch (error) {
+      console.error('Error uploading artwork:', error);
+      res.status(500).json({ error: 'Failed to upload artwork' });
     }
-
-    // Get max order and set new order as max + 1
-    const { data: maxOrderData } = await supabaseClient
-      .from('artworks')
-      .select('order')
-      .order('order', { ascending: false })
-      .limit(1);
-    const newOrder = maxOrderData?.[0]?.order ? maxOrderData[0].order + 1 : 1;
-
-    const { error } = await supabaseClient
-      .from('artworks')
-      .insert([{ title, project, year, type, description, imageurl, order: newOrder }]);
-    if (error) throw error;
-
-    res.json({ message: 'Artwork uploaded successfully', imageurl });
-  } catch (error) {
-    console.error('Error uploading artwork:', error);
-    res.status(500).json({ error: 'Failed to upload artwork' });
-  }
-});
+  });
 
 // Existing DELETE /api/artworks/:id (unchanged)
 app.delete('/api/artworks/:id', async (req, res) => {
