@@ -3,7 +3,7 @@ const { Pool } = require('pg');
 const cors = require('cors');
 const multer = require('multer');
 const Client = require('ssh2-sftp-client');
-const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
 const app = express();
 
 app.use(cors());
@@ -23,6 +23,11 @@ pool.connect((err, client, release) => {
     release();
   }
 });
+
+// Supabase client for verifying JWT
+const supabaseUrl = 'https://ydfkrwjafnuvdvezpkcp.supabase.co';
+const supabaseKey = process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkZmtyd2phZm51dmR2ZXpwa2NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxNzA0MTUsImV4cCI6MjA2MDc0NjQxNX0.kHzI8KRGFBRrLpFVvJfK2JP_P2a9nRJzDBm5h235eJw';
+const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -89,8 +94,19 @@ app.get('/api/artworks', async (req, res) => {
 
 app.delete('/api/artworks/:id', async (req, res) => {
   const { id } = req.params;
+  const token = req.headers.authorization?.split('Bearer ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
 
   try {
+    // Verify JWT token
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+
     // Fetch the artwork to get the imageurl
     const { rows } = await pool.query('SELECT imageurl FROM artworks WHERE id = $1', [id]);
     if (rows.length === 0) {
