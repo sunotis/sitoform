@@ -115,6 +115,7 @@ app.patch('/api/artworks/reorder', async (req, res) => {
 });
 
 // Existing POST /api/artworks (unchanged, but ensure order is set)
+
 app.post('/api/artworks', multer().single('image'), async (req, res) => {
     const { title, project, year, type, description } = req.body;
     const token = req.headers.authorization?.split('Bearer ')[1];
@@ -133,33 +134,49 @@ app.post('/api/artworks', multer().single('image'), async (req, res) => {
       if (req.file) {
         const sftp = new Client();
         try {
-          console.log('Connecting to SFTP:', {
+          const sftpConfig = {
             host: process.env.SFTP_HOST,
-            port: process.env.SFTP_PORT,
-            username: process.env.SFTP_USERNAME
-          }); // Debug: Log SFTP config (excluding password)
-          await sftp.connect({
-            host: process.env.SFTP_HOST,
-            port: parseInt(process.env.SFTP_PORT) || 22, // Ensure port is a number, default to 22
+            port: parseInt(process.env.SFTP_PORT) || 22,
             username: process.env.SFTP_USERNAME,
             password: process.env.SFTP_PASSWORD,
-            retries: 3, // Retry connection up to 3 times
-            readyTimeout: 10000 // 10s timeout
-          });
+            retries: 3,
+            readyTimeout: 10000
+          };
+          console.log('Attempting SFTP connection:', {
+            host: sftpConfig.host,
+            port: sftpConfig.port,
+            username: sftpConfig.username
+          }); // Debug: Log config (no password)
+          await sftp.connect(sftpConfig);
+          console.log('SFTP connected successfully');
+  
           const remotePath = `/sitoform_com/images/${req.file.originalname}`;
-          console.log('Uploading to SFTP:', remotePath); // Debug
+          console.log('Uploading to:', remotePath);
           await sftp.put(req.file.buffer, remotePath);
           imageurl = `https://sitoform.com/images/${req.file.originalname}`;
-          console.log('SFTP upload successful:', imageurl); // Debug
+          console.log('SFTP upload successful:', imageurl);
+  
+          // Verify remote directory exists
+          const dirExists = await sftp.exists('/sitoform_com/images');
+          if (!dirExists) {
+            console.log('Creating directory: /sitoform_com/images');
+            await sftp.mkdir('/sitoform_com/images', true);
+          }
           await sftp.end();
         } catch (sftpError) {
-          console.error('SFTP error:', sftpError);
-          await sftp.end().catch(() => {}); // Ensure SFTP connection closes
+          console.error('Detailed SFTP error:', {
+            message: sftpError.message,
+            code: sftpError.code,
+            stack: sftpError.stack
+          });
+          await sftp.end().catch(() => {}); // Ensure connection closes
           return res.status(500).json({ error: `Failed to upload image to SFTP: ${sftpError.message}` });
         }
+      } else {
+        console.log('No image file provided in request');
       }
   
-      // Get max order and set new order as max + 1
+      // Get max order and set new order
       const { data: maxOrderData } = await supabaseClient
         .from('artworks')
         .select('order')
@@ -167,6 +184,7 @@ app.post('/api/artworks', multer().single('image'), async (req, res) => {
         .limit(1);
       const newOrder = maxOrderData?.[0]?.order ? maxOrderData[0].order + 1 : 1;
   
+      console.log('Inserting artwork:', { title, project, year, type, description, imageurl, order: newOrder });
       const { error } = await supabaseClient
         .from('artworks')
         .insert([{ title, project, year, type, description, imageurl, order: newOrder }]);
@@ -174,7 +192,10 @@ app.post('/api/artworks', multer().single('image'), async (req, res) => {
   
       res.json({ message: 'Artwork uploaded successfully', imageurl });
     } catch (error) {
-      console.error('Error uploading artwork:', error);
+      console.error('Error uploading artwork:', {
+        message: error.message,
+        stack: error.stack
+      });
       res.status(500).json({ error: 'Failed to upload artwork' });
     }
   });
