@@ -11,7 +11,15 @@ app.use(express.json());
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: { rejectUnauthorized: false },
+  max: 10, // Limit the number of connections
+  idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
+  connectionTimeoutMillis: 2000 // Timeout connection attempts after 2 seconds
+});
+
+// Handle unexpected errors on idle clients
+pool.on('error', (err, client) => {
+  console.error('Unexpected error on idle client:', err.stack);
 });
 
 pool.connect((err, client, release) => {
@@ -218,7 +226,6 @@ app.patch('/api/artworks/:id', multer().single('image'), async (req, res) => {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
 
-    // Handle image upload if an image is provided
     let imageurl;
     if (req.file) {
       if (missingSftpVars.length > 0) {
@@ -267,7 +274,6 @@ app.patch('/api/artworks/:id', multer().single('image'), async (req, res) => {
         return res.status(500).json({ error: `Failed to upload image to SFTP: ${sftpError.message}` });
       }
 
-      // Add imageurl to updates
       updates = { ...updates, imageurl };
     }
 
