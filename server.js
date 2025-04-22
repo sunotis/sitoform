@@ -203,10 +203,10 @@ app.patch('/api/artworks/reorder', async (req, res) => {
   }
 });
 
-app.patch('/api/artworks/:id', async (req, res) => {
+app.patch('/api/artworks/:id', multer().single('image'), async (req, res) => {
   const { id } = req.params;
-  const updates = req.body;
   const token = req.headers.authorization?.split('Bearer ')[1];
+  let updates = req.body;
 
   if (!token) {
     return res.status(401).json({ error: 'No token provided' });
@@ -218,11 +218,65 @@ app.patch('/api/artworks/:id', async (req, res) => {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
 
+    // Handle image upload if an image is provided
+    let imageurl;
+    if (req.file) {
+      if (missingSftpVars.length > 0) {
+        console.error('Cannot upload image: Missing SFTP variables');
+        return res.status(500).json({ error: `SFTP configuration incomplete: missing ${missingSftpVars.join(', ')}` });
+      }
+
+      const sftp = new Client();
+      try {
+        const sftpConfig = {
+          host: process.env.SFTP_HOST,
+          port: parseInt(process.env.SFTP_PORT) || 22,
+          username: process.env.SFTP_USERNAME,
+          password: process.env.SFTP_PASSWORD,
+          retries: 3,
+          readyTimeout: 10000
+        };
+        console.log('Attempting SFTP connection for image update:', {
+          host: sftpConfig.host,
+          port: sftpConfig.port,
+          username: sftpConfig.username
+        });
+        await sftp.connect(sftpConfig);
+        console.log('SFTP connected successfully');
+
+        const remoteDir = '/sitoform_com/images';
+        const remotePath = `${remoteDir}/${req.file.originalname}`;
+        const dirExists = await sftp.exists(remoteDir);
+        if (!dirExists) {
+          console.log(`Creating directory: ${remoteDir}`);
+          await sftp.mkdir(remoteDir, true);
+        }
+
+        console.log('Uploading to:', remotePath);
+        await sftp.put(req.file.buffer, remotePath);
+        imageurl = `https://sitoform.com/images/${req.file.originalname}`;
+        console.log('SFTP upload successful:', imageurl);
+        await sftp.end();
+      } catch (sftpError) {
+        console.error('Detailed SFTP error:', {
+          message: sftpError.message,
+          code: sftpError.code,
+          stack: sftpError.stack
+        });
+        await sftp.end().catch(() => {});
+        return res.status(500).json({ error: `Failed to upload image to SFTP: ${sftpError.message}` });
+      }
+
+      // Add imageurl to updates
+      updates = { ...updates, imageurl };
+    }
+
     console.log('Updating artwork:', id, updates);
-    const { error } = await supabaseClient
+    const { data, error } = await supabaseClient
       .from('artworks')
       .update(updates)
-      .eq('id', id);
+      .eq('id', id)
+      .select();
     if (error) {
       console.error('Update artwork error:', {
         message: error.message,
@@ -233,7 +287,7 @@ app.patch('/api/artworks/:id', async (req, res) => {
       throw error;
     }
 
-    res.json({ message: 'Artwork updated successfully' });
+    res.json({ message: 'Artwork updated successfully', imageurl: data[0].imageurl });
   } catch (error) {
     console.error('Error updating artwork:', {
       message: error.message,
