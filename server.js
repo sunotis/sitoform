@@ -69,7 +69,7 @@ app.get('/api/artworks', async (req, res) => {
 });
 
 app.post('/api/artworks', multer().single('image'), async (req, res) => {
-  const { project, year, type, description } = req.body;
+  const { project, year, type, description, order } = req.body; // Added order from req.body
   const token = req.headers.authorization?.split('Bearer ')[1];
 
   if (!token) {
@@ -134,12 +134,18 @@ app.post('/api/artworks', multer().single('image'), async (req, res) => {
       return res.status(400).json({ error: 'Image file is required' });
     }
 
-    const { data: maxOrderData } = await supabaseClient
-      .from('artworks')
-      .select('order')
-      .order('order', { ascending: false })
-      .limit(1);
-    const newOrder = maxOrderData?.[0]?.order ? maxOrderData[0].order + 1 : 1;
+    // Determine the order value: use provided order, or default to max order + 1
+    let newOrder;
+    if (order && !isNaN(parseInt(order))) {
+      newOrder = parseInt(order);
+    } else {
+      const { data: maxOrderData } = await supabaseClient
+        .from('artworks')
+        .select('order')
+        .order('order', { ascending: false })
+        .limit(1);
+      newOrder = maxOrderData?.[0]?.order ? maxOrderData[0].order + 1 : 1;
+    }
 
     console.log('Inserting artwork:', { project, year, type, description, imageurl, order: newOrder });
     const { data, error } = await supabaseClient
@@ -154,6 +160,39 @@ app.post('/api/artworks', multer().single('image'), async (req, res) => {
         hint: error.hint
       });
       throw error;
+    }
+
+    // If a specific order was provided, resolve potential conflicts
+    if (order && !isNaN(parseInt(order))) {
+      const { data: allArtworks, error: fetchError } = await supabaseClient
+        .from('artworks')
+        .select('*')
+        .order('order', { ascending: true });
+
+      if (fetchError) throw fetchError;
+
+      const updatedArtworks = allArtworks.map((artwork) => {
+        if (artwork.id === data[0].id) {
+          return { ...artwork, order: newOrder };
+        }
+        return artwork;
+      });
+
+      updatedArtworks.sort((a, b) => a.order - b.order);
+      let currentOrder = 1;
+      const finalArtworks = updatedArtworks.map((artwork) => {
+        const newOrderValue = currentOrder;
+        currentOrder++;
+        return { ...artwork, order: newOrderValue };
+      });
+
+      for (const artwork of finalArtworks) {
+        const { error: updateError } = await supabaseClient
+          .from('artworks')
+          .update({ order: artwork.order })
+          .eq('id', artwork.id);
+        if (updateError) throw updateError;
+      }
     }
 
     res.json({ message: 'Artwork uploaded successfully', imageurl, id: data[0].id });
@@ -214,7 +253,7 @@ app.patch('/api/artworks/reorder', async (req, res) => {
 app.patch('/api/artworks/:id', multer().single('image'), async (req, res) => {
   const { id } = req.params;
   const token = req.headers.authorization?.split('Bearer ')[1];
-  let updates = req.body;
+  const { project, year, type, description, imageurl: bodyImageUrl, order } = req.body;
 
   if (!token) {
     return res.status(401).json({ error: 'No token provided' });
@@ -226,7 +265,10 @@ app.patch('/api/artworks/:id', multer().single('image'), async (req, res) => {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
 
-    let imageurl;
+    let updates = { project, year, type, description };
+    if (order !== undefined) updates.order = parseInt(order);
+
+    let newImageUrl = bodyImageUrl;
     if (req.file) {
       if (missingSftpVars.length > 0) {
         console.error('Cannot upload image: Missing SFTP variables');
@@ -261,8 +303,8 @@ app.patch('/api/artworks/:id', multer().single('image'), async (req, res) => {
 
         console.log('Uploading to:', remotePath);
         await sftp.put(req.file.buffer, remotePath);
-        imageurl = `https://sitoform.com/images/${req.file.originalname}`;
-        console.log('SFTP upload successful:', imageurl);
+        newImageUrl = `https://sitoform.com/images/${req.file.originalname}`;
+        console.log('SFTP upload successful:', newImageUrl);
         await sftp.end();
       } catch (sftpError) {
         console.error('Detailed SFTP error:', {
@@ -273,8 +315,65 @@ app.patch('/api/artworks/:id', multer().single('image'), async (req, res) => {
         await sftp.end().catch(() => {});
         return res.status(500).json({ error: `Failed to upload image to SFTP: ${sftpError.message}` });
       }
+    }
 
-      updates = { ...updates, imageurl };
+    if (newImageUrl) {
+      updates.imageurl = newImageUrl;
+    }
+
+    // If the order is being updated, resolve potential conflicts
+    if (order !== undefined) {
+      const newOrder = parseInt(order);
+
+      // Fetch all artworks to check for order conflicts
+      const { data: allArtworks, error: fetchError } = await supabaseClient
+        .from('artworks')
+        .select('*')
+        .order('order', { ascending: true });
+
+      if (fetchError) {
+        console.error('Fetch artworks error:', {
+          message: fetchError.message,
+          code: fetchError.code,
+          details: fetchError.details,
+          hint: fetchError.hint
+        });
+        throw fetchError;
+      }
+
+      // Update the order for the current artwork in memory
+      const updatedArtworks = allArtworks.map((artwork) => {
+        if (artwork.id === parseInt(id)) {
+          return { ...artwork, order: newOrder };
+        }
+        return artwork;
+      });
+
+      // Sort by order and reassign to avoid duplicates
+      updatedArtworks.sort((a, b) => a.order - b.order);
+      let currentOrder = 1;
+      const finalArtworks = updatedArtworks.map((artwork) => {
+        const newOrderValue = currentOrder;
+        currentOrder++;
+        return { ...artwork, order: newOrderValue };
+      });
+
+      // Update all artworks with new orders
+      for (const artwork of finalArtworks) {
+        const { error: updateError } = await supabaseClient
+          .from('artworks')
+          .update({ order: artwork.order })
+          .eq('id', artwork.id);
+        if (updateError) {
+          console.error('Update order error:', {
+            message: updateError.message,
+            code: updateError.code,
+            details: updateError.details,
+            hint: updateError.hint
+          });
+          throw updateError;
+        }
+      }
     }
 
     console.log('Updating artwork:', id, updates);
@@ -291,6 +390,10 @@ app.patch('/api/artworks/:id', multer().single('image'), async (req, res) => {
         hint: error.hint
       });
       throw error;
+    }
+
+    if (!data.length) {
+      return res.status(404).json({ error: 'Artwork not found' });
     }
 
     res.json({ message: 'Artwork updated successfully', imageurl: data[0].imageurl });
