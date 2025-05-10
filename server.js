@@ -13,10 +13,9 @@ app.use(express.json());
 
 // Set Content-Security-Policy for API responses
 app.use((req, res, next) => {
-  res.setHeader(
-    'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://sitoform.com https://via.placeholder.com blob:; connect-src 'self' https://sitoform25.onrender.com https://ydfkrwjafnuvdvezpkcp.supabase.co"
-  );
+  res.setHeader('Content-Security-Policy', "...");
+  // Remove Permissions-Policy
+  // res.setHeader('Permissions-Policy', 'interest-cohort=()');
   next();
 });
 
