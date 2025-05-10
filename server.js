@@ -15,9 +15,8 @@ app.use(express.json());
 app.use((req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.youtube.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://sitoform.com https://via.placeholder.com https://img.youtube.com blob:; frame-src 'self' https://www.youtube.com https://player.vimeo.com; connect-src 'self' https://sitoform25.onrender.com https://ydfkrwjafnuvdvezpkcp.supabase.co https://www.youtube.com https://player.vimeo.com"
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://sitoform.com https://via.placeholder.com blob:; connect-src 'self' https://sitoform25.onrender.com https://ydfkrwjafnuvdvezpkcp.supabase.co"
   );
-  res.setHeader('Permissions-Policy', "compute-pressure=(self 'https://www.youtube.com')");
   next();
 });
 
