@@ -37,4 +37,4 @@ build/
 *.sw?
 
 # Render-specific (optional, if you generate these)
-render.yaml
+# render.yaml
