@@ -4,20 +4,30 @@ const cors = require('cors');
 const multer = require('multer');
 const Client = require('ssh2-sftp-client');
 const { createClient } = require('@supabase/supabase-js');
+
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
+
+// Set Content-Security-Policy for API responses
+app.use((req, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.youtube.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://sitoform.com https://via.placeholder.com; frame-src 'self' https://www.youtube.com; connect-src 'self' https://sitoform25.onrender.com https://ydfkrwjafnuvdvezpkcp.supabase.co"
+  );
+  next();
+});
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
-  max: 10, // Limit the number of connections
-  idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
-  connectionTimeoutMillis: 2000 // Timeout connection attempts after 2 seconds
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000
 });
 
-// Handle unexpected errors on idle clients
 pool.on('error', (err, client) => {
   console.error('Unexpected error on idle client:', err.stack);
 });
@@ -69,7 +79,7 @@ app.get('/api/artworks', async (req, res) => {
 });
 
 app.post('/api/artworks', multer().single('image'), async (req, res) => {
-  const { project, year, type, description, order } = req.body; // Added order from req.body
+  const { project, year, type, description, order } = req.body;
   const token = req.headers.authorization?.split('Bearer ')[1];
 
   if (!token) {
@@ -134,7 +144,6 @@ app.post('/api/artworks', multer().single('image'), async (req, res) => {
       return res.status(400).json({ error: 'Image file is required' });
     }
 
-    // Determine the order value: use provided order, or default to max order + 1
     let newOrder;
     if (order && !isNaN(parseInt(order))) {
       newOrder = parseInt(order);
@@ -162,7 +171,6 @@ app.post('/api/artworks', multer().single('image'), async (req, res) => {
       throw error;
     }
 
-    // If a specific order was provided, resolve potential conflicts
     if (order && !isNaN(parseInt(order))) {
       const { data: allArtworks, error: fetchError } = await supabaseClient
         .from('artworks')
@@ -321,11 +329,8 @@ app.patch('/api/artworks/:id', multer().single('image'), async (req, res) => {
       updates.imageurl = newImageUrl;
     }
 
-    // If the order is being updated, resolve potential conflicts
     if (order !== undefined) {
       const newOrder = parseInt(order);
-
-      // Fetch all artworks to check for order conflicts
       const { data: allArtworks, error: fetchError } = await supabaseClient
         .from('artworks')
         .select('*')
@@ -341,7 +346,6 @@ app.patch('/api/artworks/:id', multer().single('image'), async (req, res) => {
         throw fetchError;
       }
 
-      // Update the order for the current artwork in memory
       const updatedArtworks = allArtworks.map((artwork) => {
         if (artwork.id === parseInt(id)) {
           return { ...artwork, order: newOrder };
@@ -349,7 +353,6 @@ app.patch('/api/artworks/:id', multer().single('image'), async (req, res) => {
         return artwork;
       });
 
-      // Sort by order and reassign to avoid duplicates
       updatedArtworks.sort((a, b) => a.order - b.order);
       let currentOrder = 1;
       const finalArtworks = updatedArtworks.map((artwork) => {
@@ -358,7 +361,6 @@ app.patch('/api/artworks/:id', multer().single('image'), async (req, res) => {
         return { ...artwork, order: newOrderValue };
       });
 
-      // Update all artworks with new orders
       for (const artwork of finalArtworks) {
         const { error: updateError } = await supabaseClient
           .from('artworks')
