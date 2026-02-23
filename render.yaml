@@ -3,7 +3,7 @@ services:
     name: sitoform25
     repo: https://github.com/sunotis/sitoform
     env: node
-    buildCommand: npm install
+    buildCommand: npm cache clean --force && npm ci
     startCommand: npm start
     headers:
       - path: /*
