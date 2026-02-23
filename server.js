@@ -1,5 +1,4 @@
 const express = require('express');
-const { Pool } = require('pg');
 const cors = require('cors');
 const multer = require('multer');
 const Client = require('ssh2-sftp-client');
@@ -17,28 +16,6 @@ app.use((req, res, next) => {
   // Remove Permissions-Policy
   // res.setHeader('Permissions-Policy', 'interest-cohort=()');
   next();
-});
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-  max: 10,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000
-});
-
-pool.on('error', (err, client) => {
-  console.error('Unexpected error on idle client:', err.stack);
-});
-
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error('Error connecting to database:', err.stack);
-    process.exit(1);
-  } else {
-    console.log('Database connection successful');
-    release();
-  }
 });
 
 const supabaseUrl = 'https://ydfkrwjafnuvdvezpkcp.supabase.co';
