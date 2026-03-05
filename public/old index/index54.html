@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Portfolio</title>
+  <!-- Load the local Tailwind CSS file -->
+  <link href="/css/output.css" rel="stylesheet">
+  <!-- Inter Font from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;700&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%; /* Ensure vh units work */
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #343333;
+      color: white;
+      font-family: 'Inter', sans-serif;
+    }
+    section.artwork-section {
+      background-color: #343333;
+      height: calc(100vh - 133px - 250px); /* Adjusted metadata height to ~250px */
+      min-height: 300px;
+      width: 100%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid red; /* Temporary for debugging */
+    }
+    .artwork-display {
+      height: 100%; /* Ensure container fills section */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .artwork-display img {
+      max-width: 100%;
+      max-height: 90%; /* Relative to .artwork-display height */
+      object-fit: contain;
+    }
+    /* Spinner Styles */
+    .spinner {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #ffffff33;
+      border-top: 4px solid #009FE3;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+    }
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    .blue-line {
+      height: 3px;
+      background-color: #009FE3;
+      width: 1000px;
+      position: absolute;
+      bottom: -3px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+    }
+    .vertical-line {
+      width: 2px;
+      height: 26px;
+      background-color: white;
+    }
+    .short-vertical-line {
+      width: 2px;
+      height: 36px;
+      background-color: white;
+    }
+    .metadata-section {
+      display: flex;
+      align-items: flex-start;
+      gap: 60px;
+      position: relative;
+    }
+    .metadata-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .metadata-item.project-item {
+      width: 250px;
+    }
+    .metadata-item.year-item {
+      position: absolute;
+      left: 390px;
+      width: 250px;
+    }
+    .metadata-item.type-item {
+      position: absolute;
+      left: 690px;
+      width: 250px;
+    }
+    .metadata-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      height: 36px;
+      margin-left: -40px;
+      align-content: flex-start;
+    }
+    .metadata-group .text-wrapper {
+      margin-left: 20px;
+      width: 200px;
+      min-height: 36px;
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      align-content: flex-start;
+      margin-top: 0px;
+    }
+    .number-align {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      height: 36px;
+      justify-content: space-between;
+      margin-left: 15px;
+    }
+    .description-table {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      padding-left: 36px;
+    }
+    .description-table div {
+      flex: 1;
+    }
+    .description-table div:last-child {
+      margin-left: -12px;
+    }
+    /* Font Group CSS Classes */
+    .owner {
+      font-size: 14px;
+      font-weight: 700;
+      color: #575756;
+      line-height: 1;
+    }
+    .ownersub1 {
+      font-size: 14px;
+      font-weight: 300;
+      color: #575756;
+      line-height: 1;
+    }
+    .ownersub2 {
+      font-size: 14px;
+      font-weight: 200;
+      color: #575756;
+      line-height: 1;
+    }
+    .headerlinks {
+      font-size: 14px;
+      font-weight: 200;
+      color: white;
+    }
+    .artlink {
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+    }
+    .category {
+      font-size: 12px;
+      font-weight: 100;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+    .projectdata {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 2;
+      color: white;
+    }
+    .description {
+      font-size: 14px;
+      font-weight: 200;
+      line-height: 1.5;
+      max-width: 433px;
+      color: white;
+    }
+    #description {
+      column-count: 2;
+      column-gap: 20px;
+      column-fill: auto;
+      height: auto;
+      max-height: 200px;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 200;
+      color: white;
+      margin-top: 20px;
+      padding-left: 65px;
+      white-space: pre-wrap;
+    }
+    #total-artworks {
+      font-size: 14px;
+      font-weight: 100;
+      line-height: 1;
+      color: white;
+      margin-top: -1px;
+    }
+    #artwork-number {
+      margin-top: 1px;
+    }
+    /* Header-specific styles */
+    header {
+      overflow: visible;
+      position: relative;
+    }
+    .header-content {
+      position: relative;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+      min-height: 133px;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .blue-line {
+        width: 90%;
+        bottom: -3px;
+        z-index: 100;
+      }
+      .header-content {
+        padding: 0 10px;
+      }
+      .logo {
+        width: 150px;
+        height: auto;
+      }
+      .header-text {
+        left: 200px !important;
+        font-size: 12px;
+      }
+      .nav-links {
+        left: 200px !important;
+        top: 60px !important;
+        font-size: 12px;
+      }
+      .art-link {
+        right: 10px !important;
+        font-size: 12px;
+      }
+      .metadata-section {
+        flex-direction: column;
+        padding: 0 10px;
+        gap: 10px;
+      }
+      .metadata-item {
+        width: 100% !important;
+        max-width: none !important;
+        margin-bottom: 10px;
+        position: static;
+      }
+      .vertical-line {
+        display: none;
+      }
+      .description-table {
+        flex-direction: column;
+      }
+      .description-table div:last-child {
+        margin-left: 0;
+      }
+      section.artwork-section {
+        height: calc(100vh - 133px - 350px); /* Adjusted for mobile metadata ~350px */
+        min-height: 200px;
+        border: 1px solid red; /* Temporary for debugging */
+      }
+      .artwork-display {
+        height: 100%;
+      }
+      .artwork-display img {
+        max-height: 90%;
+      }
+      .swipe-btn {
+        font-size: 1.5rem;
+      }
+      .owner, .ownersub1, .ownersub2, .headerlinks, .artlink, .projectdata, .description {
+        font-size: 12px;
+      }
+      .category {
+        font-size: 10px;
+      }
+      .spinner {
+        width: 30px;
+        height: 30px;
+        border: 3px solid #ffffff33;
+        border-top: 3px solid #009FE3;
+      }
+      #description {
+        column-count: 1;
+        padding-left: 20px;
+        white-space: pre-wrap;
+      }
+      #total-artworks {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Section -->
+  <header class="w-full h-[133px] bg-[#343333] overflow-visible relative">
+    <div class="header-content max-w-[1000px] mx-auto relative">
+      <div class="logo absolute left-[40px] top-[18px]">
+        <img src="https://sitoform.com/logo/sito+RDA_logo01" alt="Logo" class="w-[210px] h-[75px]" />
+      </div>
+      <div class="header-text absolute left-[278px] top-[15px] leading-tight">
+        <p class="owner">SITO SCHWARZENBERGER</p>
+        <p class="ownersub1">RADIKAL DESIGN</p>
+        <p class="ownersub2">ALLIANCE</p>
+      </div>
+      <nav class="nav-links absolute left-[278px] top-[76px] flex space-x-2">
+        <a href="#" class="headerlinks hover:underline">BIOGRAPHY</a>
+        <a href="#" class="headerlinks hover:underline">CONTACT</a>
+        <a href="#" class="headerlinks hover:underline">VISUALS</a>
+      </nav>
+      <a href="#" class="art-link absolute right-[50px] top-[15px] artlink hover:underline">> ART</a>
+      <div class="blue-line"></div>
+    </div>
+  </header>
+
+  <!-- Metadata Section -->
+  <section class="w-full py-4 bg-[#343333]">
+    <div class="max-w-[1000px] mx-auto">
+      <!-- Metadata Row -->
+      <div class="metadata-section flex items-start">
+        <!-- Total and Current Artwork Numbers -->
+        <div class="metadata-item w-[50px] text-right">
+          <div class="number-align">
+            <p id="total-artworks" class="projectdata">0</p>
+            <p id="artwork-number" class="projectdata"></p>
+          </div>
+        </div>
+        <!-- Project -->
+        <div class="metadata-item project-item">
+          <div class="metadata-group">
+            <div class="short-vertical-line"></div>
+            <div class="text-wrapper">
+              <p class="category">PROJECT</p>
+              <p id="artwork-title" class="projectdata"></p>
+            </div>
+          </div>
+        </div>
+        <!-- Year -->
+        <div class="metadata-item year-item">
+          <div class="metadata-group">
+            <div class="short-vertical-line"></div>
+            <div class="text-wrapper">
+              <p class="category">YEAR</p>
+              <p id="artwork-year" class="projectdata"></p>
+            </div>
+          </div>
+        </div>
+        <!-- Type -->
+        <div class="metadata-item type-item">
+          <div class="metadata-group">
+            <div class="short-vertical-line"></div>
+            <div class="text-wrapper">
+              <p class="category">TYPE</p>
+              <p id="artwork-type" class="projectdata"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Description -->
+      <div id="description"></div>
+    </div>
+  </section>
+
+  <!-- Artwork Section -->
+  <section class="artwork-section">
+    <div class="max-w-[1000px] mx-auto text-center">
+      <div id="artwork-display" class="artwork-display">
+        <div class="spinner" id="loading-spinner"></div>
+        <img src="" alt="Artwork" id="artwork-image" />
+      </div>
+      <!-- Swipe Controls -->
+      <button id="swipe-left" class="swipe-btn absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-2xl" disabled><</button>
+      <button id="swipe-right" class="swipe-btn absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-2xl">></button>
+    </div>
+  </section>
+
+  <!-- JavaScript for Swipe Functionality -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    let artworks = [];
+    let currentIndex = 0;
+    let typingTimeout = null;
+
+    // DOM elements
+    const totalArtworks = document.getElementById('total-artworks');
+    const artworkNumber = document.getElementById('artwork-number');
+    const artworkTitle = document.getElementById('artwork-title');
+    const artworkYear = document.getElementById('artwork-year');
+    const artworkType = document.getElementById('artwork-type');
+    const description = document.getElementById('description');
+    const artworkDisplay = document.getElementById('artwork-display');
+    const artworkImage = document.getElementById('artwork-image');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const swipeLeftBtn = document.getElementById('swipe-left');
+    const swipeRightBtn = document.getElementById('swipe-right');
+
+    // Supabase client (not used directly since we use API)
+    const supabaseUrl = 'https://ydfkrwjafnuvdvezpkcp.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkZmtyd2phZm51dmR2ZXpwa2NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxNzA0MTUsImV4cCI6MjA2MDc0NjQxNX0.kHzI8KRGFBRrLpFVvJfK2JP_P2a9nRJzDBm5h235eJw';
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Typewriter effect function
+    function typeWriter(element, text, speed = 100, callback) {
+      element.textContent = '';
+      let i = 0;
+      function type() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          typingTimeout = setTimeout(type, speed);
+        } else if (callback) {
+          callback();
+        }
+      }
+      type();
+    }
+
+    // Stop ongoing typing animations
+    function stopTyping() {
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+        typingTimeout = null;
+      }
+      [totalArtworks, artworkNumber, artworkTitle, artworkYear, artworkType].forEach(el => {
+        el.textContent = '';
+      });
+    }
+
+    // Show loading spinner
+    function showSpinner() {
+      loadingSpinner.style.display = 'block';
+      artworkImage.style.display = 'none';
+      artworkDisplay.innerHTML = '';
+      artworkDisplay.appendChild(loadingSpinner);
+      artworkDisplay.appendChild(artworkImage);
+    }
+
+    // Hide loading spinner
+    function hideSpinner() {
+      loadingSpinner.style.display = 'none';
+      artworkImage.style.display = 'block';
+    }
+
+    // Update UI with current artwork
+    function updateArtwork() {
+      stopTyping();
+      const currentArtwork = artworks[currentIndex];
+
+      // Apply typewriter effect to total and artwork number first
+      typeWriter(totalArtworks, `${artworks.length}`, 100);
+      typeWriter(artworkNumber, `${currentIndex + 1}`, 100, () => {
+        // Start typewriter effect for all metadata items simultaneously
+        typeWriter(artworkTitle, currentArtwork.project || 'N/A', 100);
+        typeWriter(artworkYear, currentArtwork.year || 'N/A', 100);
+        typeWriter(artworkType, currentArtwork.type || 'N/A', 100);
+      });
+
+      // Set description text directly
+      description.textContent = currentArtwork.description || 'No description available';
+      hideSpinner();
+
+      // Update image
+      const imageSrc = currentArtwork.imageurl || 'https://via.placeholder.com/300?text=No+Image';
+      artworkImage.src = imageSrc;
+      artworkImage.alt = currentArtwork.project || 'Artwork';
+
+      // Update button states
+      swipeLeftBtn.disabled = currentIndex === 0;
+      swipeRightBtn.disabled = currentIndex === artworks.length - 1;
+    }
+
+    // Fetch artworks from API
+    async function fetchArtworks() {
+      showSpinner();
+      try {
+        const response = await fetch('https://sitoform25.onrender.com/api/artworks');
+        if (!response.ok) throw new Error('Failed to fetch artworks');
+        artworks = await response.json();
+
+        if (artworks.length === 0) {
+          artworkDisplay.innerHTML = '<p>No artworks found.</p>';
+          hideSpinner();
+          return;
+        }
+
+        artworks = artworks.map((artwork, index) => ({
+          number: index + 1,
+          project: artwork.project,
+          year: artwork.year,
+          type: artwork.type,
+          description: artwork.description,
+          imageurl: artwork.imageurl
+        }));
+
+        totalArtworks.textContent = `${artworks.length}`;
+        currentIndex = 0;
+        updateArtwork();
+      } catch (error) {
+        console.error('Error fetching from API:', error);
+        // Fallback to artworks.json
+        try {
+          const response = await fetch('https://sitoform.com/data/artworks.json');
+          const fallbackData = await response.json();
+
+          if (fallbackData.length === 0) {
+            artworkDisplay.innerHTML = '<p>No artworks found (fallback).</p>';
+            hideSpinner();
+            return;
+          }
+
+          artworks = fallbackData.map((artwork, index) => ({
+            number: index + 1,
+            project: artwork.project,
+            year: artwork.year,
+            type: artwork.type,
+            description: artwork.description,
+            imageurl: artwork.imageurl
+          }));
+
+          totalArtworks.textContent = `${artworks.length}`;
+          currentIndex = 0;
+          updateArtwork();
+        } catch (fallbackError) {
+          console.error('Error fetching fallback artworks.json:', fallbackError);
+          artworkDisplay.innerHTML = '<p>Error loading artworks.</p>';
+          hideSpinner();
+        }
+      }
+    }
+
+    // Swipe functionality
+    swipeLeftBtn.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        showSpinner();
+        const img = new Image();
+        img.src = artworks[currentIndex].imageurl || 'https://via.placeholder.com/300?text=No+Image';
+        img.onload = updateArtwork;
+        img.onerror = () => {
+          console.error('Error loading image:', img.src);
+          updateArtwork();
+        };
+      }
+    });
+
+    swipeRightBtn.addEventListener('click', () => {
+      if (currentIndex < artworks.length - 1) {
+        currentIndex++;
+        showSpinner();
+        const img = new Image();
+        img.src = artworks[currentIndex].imageurl || 'https://via.placeholder.com/300?text=No+Image';
+        img.onload = updateArtwork;
+        img.onerror = () => {
+          console.error('Error loading image:', img.src);
+          updateArtwork();
+        };
+      }
+    });
+
+    // Fetch and render artworks on page load
+    fetchArtworks();
+  </script>
+</body>
+</html>

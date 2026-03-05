@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sito Schwarzenberger GRAPHIC DESIGN Sitoform</title>
+  <!-- Load the local Tailwind CSS file -->
+  <link href="/css/output.css" rel="stylesheet">
+  <!-- Inter Font from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;700&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+    body {
+      background-color: #343333;
+      color: white;
+      font-family: 'Inter', sans-serif;
+    }
+    header {
+      z-index: 10;
+      position: relative;
+      background: transparent !important;
+    }
+    #loading-progress {
+      display: none; /* Hidden by default */
+      z-index: 20;
+      text-shadow: 0 0 4px rgba(0, 0, 0, 0.8); /* Improve readability */
+    }
+    #loading-progress.active {
+      display: block; /* Show when active */
+    }
+    section.artwork-section {
+      background-color: #343333;
+      max-width: 1000px;
+      min-height: 200px;
+      min-width: 250px;
+      margin: 0 auto;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+      overflow: hidden;
+      transition: margin-top 0.3s ease;
+      margin-top: 0px; /* Adjusted for desktop to prevent overlap */
+    }
+    .artwork-display {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      box-sizing: border-box;
+      z-index: 5;
+    }
+    .artwork-display img {
+      max-width: 100%;
+      object-fit: contain;
+      object-position: top;
+      opacity: 0;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    #artwork-image {
+      opacity: 0;
+      animation: fadeIn 0.5s ease-in forwards;
+    }
+    .spinner {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #ffffff33;
+      border-top: 4px solid #009FE3;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+    }
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    .blue-line {
+      height: 3px;
+      background-color: #009FE3;
+      width: 1000px;
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+    }
+    .vertical-line {
+      width: 2px;
+      height: 26px;
+      background-color: white;
+    }
+    .short-vertical-line {
+      width: 2px;
+      height: 36px;
+      background-color: white;
+    }
+    .metadata-container {
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
+    }
+    .metadata-section {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      max-width: 1000px;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 60px;
+      z-index: 10;
+    }
+    .metadata-row {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+    }
+    .metadata-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+      margin-left: 0;
+    }
+    .metadata-item.text-left {
+      width: 50px;
+      min-width: 50px;
+      flex-shrink: 0;
+      text-align: left;
+      margin-left: 0;
+    }
+    .metadata-item.project-item {
+      margin-left: 35px;
+      width: 240px;
+      flex-shrink: 0;
+    }
+    .metadata-item.year-item {
+      position: absolute;
+      left: 360px;
+      width: 240px;
+      margin-left: 50px;
+    }
+    .metadata-item.type-item {
+      position: absolute;
+      left: 625px;
+      width: 240px;
+    }
+    .metadata-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      height: 36px;
+      margin-left: -40px;
+      align-content: flex-start;
+    }
+    .metadata-group .text-wrapper {
+      margin-left: 20px;
+      width: 255px;
+      min-height: 36px;
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      align-content: flex-start;
+      margin-top: 0px;
+    }
+    .number-align {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      height: 36px;
+      justify-content: space-between;
+      margin-left: 0px;
+      font-family: 'Courier New', monospace;
+    }
+    .description-wrapper {
+      margin-left: 67px;
+      width: 820px;
+      margin-top: 55px;
+    }
+    .arrow-container {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      transition: bottom 0.3s ease;
+    }
+    .arrow-wrapper {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 15;
+    }
+    .arrow {
+      height: 10px;
+      width: auto;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    .arrow-left {
+      transform: rotate(180deg);
+      margin-right: 30px;
+    }
+    .arrow-right {
+      transform: rotate(0deg);
+      margin-left: 30px;
+    }
+    .arrow.disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+    .arrow-wrapper:not(.disabled):hover .arrow-left {
+      transform: rotate(180deg) scale(1.2);
+    }
+    .arrow-wrapper:not(.disabled):hover .arrow-right {
+      transform: rotate(0deg) scale(1.2);
+    }
+    .slider-wrapper {
+      flex-grow: 1;
+      position: relative;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+      margin: 15px;
+    }
+    #artwork-slider {
+      width: 100%;
+      height: 3px;
+      background: transparent;
+      -webkit-appearance: none;
+      appearance: none;
+      outline: none;
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    #artwork-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 11px;
+      height: 11px;
+      background: white;
+      border: none;
+      opacity: 0.05;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    #artwork-slider::-moz-range-thumb {
+      width: 11px;
+      height: 11px;
+      background: white;
+      border: none;
+      opacity: 0.05;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    #artwork-slider::-webkit-slider-thumb:hover,
+    #artwork-slider::-moz-range-thumb:hover {
+      transform: scale(1.2);
+    }
+    .hover-area {
+      position: fixed;
+      top: 0;
+      height: 100%;
+      width: 45%;
+      z-index: 5;
+      cursor: pointer;
+    }
+    .hover-left { left: 0; }
+    .hover-right { right: 0; }
+    .owner {
+      font-size: 14px;
+      font-weight: 700;
+      color: #575756;
+      line-height: 1;
+    }
+    .ownersub1 {
+      font-size: 14px;
+      font-weight: 300;
+      color: #575756;
+      line-height: 1;
+    }
+    .ownersub2 {
+      font-size: 14px;
+      font-weight: 200;
+      color: #575756;
+      line-height: 1;
+    }
+    .headerlinks {
+      font-size: 14px;
+      font-weight: 200;
+      color: white;
+    }
+    .artlink {
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+    }
+    .category {
+      font-size: 12px;
+      font-weight: 100;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+    .projectdata {
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 2;
+      color: white;
+    }
+    .description {
+      font-size: 14px;
+      font-weight: 200;
+      line-height: 1.5;
+      max-width: 433px;
+      color: white;
+    }
+    #description {
+      column-count: 2;
+      column-width: 400px;
+      column-gap: 20px;
+      column-fill: auto;
+      height: auto;
+      max-height: 108px;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 200;
+      color: white;
+      white-space: pre-wrap;
+    }
+    #total-artworks {
+      font-size: 14px;
+      font-weight: 100;
+      line-height: 1;
+      color: white;
+      margin-top: -1px;
+    }
+    #artwork-number {
+      margin-top: 1px;
+    }
+    .header-text {
+      margin-top: -3px;
+    }
+    .header-content {
+      position: relative;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+      min-height: 133px;
+      padding: 18px 40px;
+    }
+    .header-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 28px;
+    }
+    .logo {
+      flex-shrink: 0;
+      margin-left: -14px;
+    }
+    .logo img {
+      width: 210px;
+      height: 75px;
+    }
+    .header-text-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-top: 3px;
+    }
+    .header-text {
+      flex-grow: 0;
+    }
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      padding-top: 8px;
+    }
+    .art-link {
+      margin-left: auto;
+      padding-top: 3px;
+    }
+    .w-full.py-4 {
+      position: relative;
+      min-height: 200px;
+      padding-bottom: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      overflow: visible !important;
+    }
+    .year-type-row {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+    /* Media query for 769px–999px */
+    @media (min-width: 769px) and (max-width: 999px) {
+      .blue-line {
+        width: 90%;
+        max-width: 960px;
+      }
+      .metadata-container {
+        width: 90%;
+      }
+      .metadata-section {
+        position: static;
+        max-width: 100%;
+        margin: 0 auto;
+        transform: none;
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+        padding: 0 0 5px 0;
+      }
+      .metadata-row {
+        flex-direction: row;
+        gap: 10px;
+      }
+      .metadata-item {
+        position: static;
+        width: auto;
+        max-width: none;
+        margin-left: 0;
+        margin-bottom: 0;
+      }
+      .metadata-item.text-left {
+        width: 50px;
+        min-width: 50px;
+      }
+      .metadata-item.project-item {
+        margin-left: 0;
+        width: 200px;
+      }
+      .metadata-item.year-item,
+      .metadata-item.type-item {
+        width: 200px;
+      }
+      .metadata-group {
+        margin-left: 0;
+        height: auto;
+        flex-wrap: nowrap;
+        gap: 8px;
+      }
+      .metadata-group .text-wrapper {
+        margin-left: 0;
+        width: calc(100% - 10px);
+        max-width: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .number-align {
+        height: auto;
+      }
+      .description-wrapper {
+        margin-left: 0;
+        width: 100%;
+        margin-top: 5px;
+      }
+      .description {
+        font-size: 12px;
+        line-height: 1.6;
+      }
+      #description {
+        column-count: 1;
+        max-width: 100%;
+        max-height: 150px;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+      .arrow-container {
+        width: 90%;
+        max-width: 960px;
+      }
+      section.artwork-section {
+        max-width: 90%;
+        margin: 0 auto;
+        margin-top: -60px; /* Default for tablet */
+      }
+      .year-type-row {
+        flex-direction: row;
+        gap: 10px;
+      }
+      .w-full.py-4 {
+        padding-top: 0;
+        padding-bottom: 20px;
+      }
+      .header-content {
+        padding: 18px 65px;
+      }
+    }
+    /* Mobile media query (≤768px) */
+    @media (max-width: 768px) {
+      .blue-line {
+        width: calc(100% * (90 / 90)); /* 90% of viewport */
+        bottom: -8px;
+        z-index: 100;
+      }
+      .header-content {
+        width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 10px 0;
+        min-height: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        background: transparent !important;
+      }
+      .header-top {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 10px;
+      }
+      .header-text-nav {
+        flex-direction: column;
+        gap: 0;
+        order: unset;
+        width: auto;
+        margin-top: 0;
+        padding-top: 4px;
+      }
+      .logo {
+        margin-left: 0;
+      }
+      .logo img {
+        width: 153px;
+        height: auto;
+      }
+      .header-text {
+        font-size: 11px;
+      }
+      .owner, .ownersub1, .ownersub2 {
+        font-size: 11px;
+        line-height: 1.1;
+      }
+      .art-link {
+        font-size: 12px;
+        margin-left: auto;
+      }
+      .nav-links {
+        flex-direction: row;
+        gap: 1px;
+        width: auto;
+        justify-content: flex-start;
+      }
+      .headerlinks {
+        font-size: 11px;
+      }
+      .metadata-container {
+        width: 100%;
+        max-width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+        position: relative;
+        overflow: visible !important;
+      }
+      .metadata-section {
+        position: static !important;
+        transform: none !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        margin-top: -50px !important;
+        flex-direction: column;
+        padding: 10px 0;
+        gap: 10px;
+        display: flex !important;
+        visibility: visible !important;
+        z-index: 150 !important;
+        height: auto;
+        overflow: visible;
+      }
+      .metadata-row {
+        flex-direction: row;
+        gap: 8px;
+        width: 100%;
+        align-items: flex-start;
+        flex-wrap: nowrap;
+        margin-left: 0 !important;
+      }
+      .metadata-item {
+        position: static !important;
+        left: auto !important;
+        margin-bottom: 0;
+        margin-left: 0 !important;
+        flex-shrink: 0;
+      }
+      .metadata-item.text-left {
+        width: 40px;
+        min-width: 40px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0;
+        flex-shrink: 0;
+      }
+      .metadata-item.project-item {
+        flex: 1 1 0;
+        min-width: 0;
+        max-width: calc(100% - 48px);
+        margin-left: 0 !important;
+      }
+      .metadata-group .short-vertical-line {
+        margin-right: 5px;
+      }
+      .year-type-row {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        width: 100%;
+        margin-left: 48px;
+        margin-top: -10px;
+      }
+      .metadata-item.year-item,
+      .metadata-item.type-item {
+        width: calc(50% - 5px);
+        max-width: none;
+        margin-left: 0;
+      }
+      .metadata-group {
+        margin-left: 0;
+        height: auto;
+        width: 100%;
+        flex-wrap: nowrap;
+        gap: 3px;
+      }
+      .metadata-group .text-wrapper {
+        margin-left: 5px;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        flex-shrink: 1;
+        white-space: normal;
+        overflow-wrap: break-word;
+        margin-top: -2px;
+      }
+      .projectdata {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      .number-align {
+        align-items: flex-start;
+        margin-left: 0;
+        height: auto;
+        font-size: 12px;
+      }
+      .description-wrapper {
+        margin-left: 0;
+        width: 100%;
+        margin-top: 0px;
+        padding: 0;
+      }
+      .description {
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      #description {
+        column-count: 1;
+        max-width: 100%;
+        height: auto;
+        max-height: 150px;
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      .short-vertical-line {
+        height: 27px;
+      }
+      section.artwork-section {
+        max-width: 90%;
+        min-height: 150px;
+        min-width: 200px;
+        margin: 20px auto 0; /* Default for mobile */
+        overflow: hidden;
+      }
+      .artwork-display {
+        width: 100%;
+        height: 100%;
+        padding: 5px;
+        align-items: flex-start;
+      }
+      .artwork-display img {
+        max-width: 100%;
+        object-position: top;
+      }
+      .arrow-container {
+        bottom: -42px; /* Default for mobile */
+        width: calc(100% * (90 / 90)); /* Match blue-line width (90%) */
+        left: 50%;
+        transform: translateX(-50%);
+        height: 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .arrow-wrapper {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .arrow {
+        height: 14px;
+      }
+      .arrow-left {
+        margin-right: 28px; /* Updated to align with blue-line */
+      }
+      .arrow-right {
+        margin-left: 28px; /* Updated to align with blue-line */
+      }
+      .arrow-wrapper:not(.disabled):hover .arrow-left {
+        transform: rotate(180deg) scale(1.2);
+      }
+      .arrow-wrapper:not(.disabled):hover .arrow-right {
+        transform: rotate(0deg) scale(1.2);
+      }
+      .slider-wrapper {
+        height: 40px;
+        padding: 0 10px;
+        margin: 0; /* Remove margin to maximize slider width */
+      }
+      .category {
+        font-size: 12px;
+        line-height: 1.2;
+      }
+      #artwork-slider {
+        height: 3px;
+      }
+      #artwork-slider::-webkit-slider-thumb {
+        width: 16px;
+        height: 16px;
+        border: none;
+        opacity: 0.05;
+      }
+      #artwork-slider::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        border: none;
+        opacity: 0.05;
+      }
+      .spinner {
+        width: 30px;
+        height: 30px;
+        border: 3px solid #ffffff33;
+        border-top: 3px solid #009FE3;
+      }
+      .w-full.py-4 {
+        min-height: 200px;
+        padding-bottom: 40px;
+        padding-top: 10px;
+      }
+    }
+</style>
+</head>
+<body>
+  <!-- Hover Areas for Arrows -->
+  <div class="hover-area hover-left" id="hover-left"></div>
+  <div class="hover-area hover-right" id="hover-right"></div>
+
+  <!-- Header Section -->
+  <header class="w-full h-[133px] bg-[#343333] overflow-visible relative">
+    <div class="header-content max-w-[1000px] mx-auto relative">
+      <div class="header-top flex">
+        <div class="logo">
+          <img src="https://sitoform.com/logo/sito+RDA_logo01" alt="Logo" class="w-[210px] h-[75px]" />
+        </div>
+        <div class="header-text-nav">
+          <div class="header-text leading-tight">
+            <p class="owner">SITO SCHWARZENBERGER</p>
+            <p class="ownersub1">RADIKAL DESIGN</p>
+            <p class="ownersub2">ALLIANCE</p>
+          </div>
+          <nav class="nav-links flex space-x-2">
+            <a href="https://sitoform.com/about" class="headerlinks hover:underline">BIOGRAPHY</a>
+            <a href="https://sitoform.com/about" class="headerlinks hover:underline">CONTACT</a>
+            <a href="https://sitoform.com/visuals" class="headerlinks hover:underline">VISUALS</a>
+          </nav>
+        </div>
+        <a href="https://sitoschwarzenberger.art" class="art-link artlink hover:underline">> ART</a>
+      </div>
+      <div class="blue-line"></div>
+    </div>
+  </header>
+
+<!-- Metadata Section -->
+<section class="w-full py-4 bg-[#343333]">
+  <div class="metadata-container">
+    <!-- Metadata Row -->
+    <div class="metadata-section flex items-start">
+      <div class="metadata-row">
+        <!-- Total and Current Artwork Numbers -->
+        <div class="metadata-item text-left">
+          <div class="number-align">
+            <p id="total-artworks" class="projectdata">0</p>
+            <p id="artwork-number" class="projectdata"></p>
+          </div>
+        </div>
+        <!-- Project -->
+        <div class="metadata-item project-item">
+          <div class="metadata-group">
+            <div class="short-vertical-line"></div>
+            <div class="text-wrapper">
+              <p class="category">PROJECT</p>
+              <p id="artwork-title" class="projectdata"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Year and Type Row -->
+      <div class="year-type-row">
+        <!-- Year -->
+        <div class="metadata-item year-item">
+          <div class="metadata-group">
+            <div class="short-vertical-line"></div>
+            <div class="text-wrapper">
+              <p class="category">YEAR</p>
+              <p id="artwork-year" class="projectdata"></p>
+            </div>
+          </div>
+        </div>
+        <!-- Type -->
+        <div class="metadata-item type-item">
+          <div class="metadata-group">
+            <div class="short-vertical-line"></div>
+            <div class="text-wrapper">
+              <p class="category">TYPE</p>
+              <p id="artwork-type" class="projectdata"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Description -->
+    <div class="description-wrapper">
+      <div id="description"></div>
+    </div>
+    <!-- Arrows and Slider -->
+    <div class="arrow-container">
+      <div class="arrow-wrapper" id="arrow-left-wrapper">
+        <img src="/images/nextArrow_01.svg" alt="Previous Arrow" class="arrow arrow-left" id="arrow-left">
+      </div>
+      <div class="slider-wrapper">
+        <input type="range" id="artwork-slider" min="1" value="1" step="1">
+      </div>
+      <div class="arrow-wrapper" id="arrow-right-wrapper">
+        <img src="/images/nextArrow_01.svg" alt="Next Arrow" class="arrow arrow-right" id="arrow-right">
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- Artwork Section -->
+  <section class="artwork-section">
+    <div class="max-w-[1000px] mx-auto text-center">
+      <div id="artwork-display" class="artwork-display">
+        <div id="loading-spinner" class="absolute hidden">
+          <svg class="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </div>
+        <div id="loading-progress" class="absolute hidden text-white text-lg font-semibold">
+          <span id="progress-percentage">0%</span>
+        </div>
+        <img src="" alt="Artwork" id="artwork-image" />
+      </div>
+    </div>
+  </section>
+
+  <!-- JavaScript for Swipe Functionality -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    let artworks = [];
+    let currentIndex = 0;
+    const typingTimeouts = new Map(); // Store timeouts for each element
+    const imageCache = new Map(); // Cache for preloaded images
+  
+    // DOM elements
+    const totalArtworks = document.getElementById('total-artworks');
+    const artworkNumber = document.getElementById('artwork-number');
+    const artworkTitle = document.getElementById('artwork-title');
+    const artworkYear = document.getElementById('artwork-year');
+    const artworkType = document.getElementById('artwork-type');
+    const description = document.getElementById('description');
+    const artworkDisplay = document.getElementById('artwork-display');
+    const artworkImage = document.getElementById('artwork-image');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const loadingProgress = document.getElementById('loading-progress');
+    const progressPercentage = document.getElementById('progress-percentage');
+    const arrowLeft = document.getElementById('arrow-left');
+    const arrowRight = document.getElementById('arrow-right');
+    const arrowLeftWrapper = document.getElementById('arrow-left-wrapper');
+    const arrowRightWrapper = document.getElementById('arrow-right-wrapper');
+    const hoverLeft = document.getElementById('hover-left');
+    const hoverRight = document.getElementById('hover-right');
+    const artworkSection = document.querySelector('.artwork-section');
+    const metadataSection = document.querySelector('.w-full.py-4');
+    const artworkSlider = document.getElementById('artwork-slider');
+    const arrowContainer = document.querySelector('.arrow-container');
+    const blueLine = document.querySelector('.blue-line');
+  
+    // Observe description content changes
+    const descriptionObserver = new MutationObserver(() => {
+      console.log('Description observer triggered');
+      adjustLayoutBasedOnDescription();
+    });
+    descriptionObserver.observe(description, { childList: true, characterData: true, subtree: true });
+  
+    // Supabase client (not used directly since we use API)
+    const supabaseUrl = 'https://ydfkrwjafnuvdvezpkcp.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkZmtyd2phZm51dmR2ZXpwa2NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxNzA0MTUsImV4cCI6MjA2MDc0NjQxNX0.kHzI8KRGFBRrLpFVvJfK2JP_P2a9nRJzDBm5h235eJw';
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+  
+    // Debounce slider updates
+    let debounceTimeout;
+    artworkSlider.addEventListener('input', (e) => {
+      clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(() => {
+        const newIndex = parseInt(e.target.value) - 1;
+        if (newIndex !== currentIndex) {
+          currentIndex = newIndex;
+          showSpinner();
+          loadImageWithProgress(artworks[currentIndex].imageurl || 'https://via.placeholder.com/300?text=No+Image', updateArtwork);
+        }
+      }, 100); // Debounce by 100ms
+    });
+  
+    // Add keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.keyCode === 37) { // Left arrow key
+        swipeLeft();
+      } else if (e.keyCode === 39) { // Right arrow key
+        swipeRight();
+      }
+    });
+  
+    // Function to load image with progress tracking
+    function loadImageWithProgress(url, callback) {
+      // Append Supabase transformation parameters
+      const optimizedUrl = `${url}?width=800&quality=75`; // Resize to 800px, 75% quality
+      console.log('Loading image:', optimizedUrl);
+  
+      // Check cache
+      if (imageCache.has(optimizedUrl)) {
+        console.log('Using cached image:', optimizedUrl);
+        artworkImage.src = imageCache.get(optimizedUrl);
+        hideSpinner();
+        hideProgress();
+        callback();
+        return;
+      }
+  
+      // Use XMLHttpRequest for progress tracking
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', optimizedUrl, true);
+      xhr.responseType = 'blob';
+  
+      xhr.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = Math.round((event.loaded / event.total) * 100);
+          progressPercentage.textContent = `${percentComplete}%`;
+          loadingProgress.classList.add('active');
+          console.log(`Image loading progress: ${percentComplete}%`);
+        }
+      };
+  
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          const blob = xhr.response;
+          const objectUrl = URL.createObjectURL(blob);
+          imageCache.set(optimizedUrl, objectUrl); // Cache the image
+          artworkImage.src = objectUrl;
+          hideSpinner();
+          hideProgress();
+          callback();
+        } else {
+          console.error('Error loading image:', xhr.status);
+          artworkImage.src = 'https://via.placeholder.com/300?text=Error';
+          hideSpinner();
+          hideProgress();
+          callback();
+        }
+      };
+  
+      xhr.onerror = () => {
+        console.error('Error loading image:', optimizedUrl);
+        artworkImage.src = 'https://via.placeholder.com/300?text=Error';
+        hideSpinner();
+        hideProgress();
+        callback();
+      };
+  
+      showSpinner();
+      showProgress();
+      xhr.send();
+    }
+  
+    // Preload adjacent images
+    function preloadImages() {
+      const indicesToPreload = [
+        currentIndex - 1 >= 0 ? currentIndex - 1 : null,
+        currentIndex + 1 < artworks.length ? currentIndex + 1 : null
+      ].filter(i => i !== null);
+  
+      indicesToPreload.forEach(index => {
+        const url = artworks[index].imageurl || 'https://via.placeholder.com/300?text=No+Image';
+        const optimizedUrl = `${url}?width=800&quality=75`;
+        if (!imageCache.has(optimizedUrl)) {
+          const img = new Image();
+          img.src = optimizedUrl;
+          img.onload = () => {
+            imageCache.set(optimizedUrl, optimizedUrl);
+            console.log('Preloaded image:', optimizedUrl);
+          };
+          img.onerror = () => console.error('Error preloading image:', optimizedUrl);
+        }
+      });
+    }
+  
+    // Show/hide progress
+    function showProgress() {
+      loadingProgress.classList.add('active');
+      progressPercentage.textContent = '0%';
+    }
+    function hideProgress() {
+      loadingProgress.classList.remove('active');
+    }
+  
+    // Function to adjust artwork section height and scale image
+    function adjustArtworkHeightAndScale() {
+      const headerHeight = document.querySelector('header').offsetHeight;
+      const metadataHeight = metadataSection.offsetHeight;
+      const viewportHeight = window.innerHeight;
+      const paddingTotal = parseInt(getComputedStyle(artworkDisplay).paddingTop) + parseInt(getComputedStyle(artworkDisplay).paddingBottom);
+      const availableHeight = viewportHeight - headerHeight - metadataHeight - 20;
+      const minHeight = window.innerWidth <= 768 ? 150 : 200;
+  
+      const sectionHeight = Math.max(minHeight, availableHeight);
+      artworkSection.style.height = `${sectionHeight}px`;
+  
+      if (artworkImage.naturalWidth && artworkImage.naturalHeight) {
+        const containerWidth = artworkSection.offsetWidth - (parseInt(getComputedStyle(artworkDisplay).paddingLeft) + parseInt(getComputedStyle(artworkDisplay).paddingRight));
+        const containerHeight = sectionHeight - paddingTotal;
+  
+        const widthScale = containerWidth / artworkImage.naturalWidth;
+        let scaledHeight = artworkImage.naturalHeight * widthScale;
+  
+        if (scaledHeight > containerHeight) {
+          const heightScale = containerHeight / scaledHeight;
+          scaledHeight = containerHeight;
+          const scaledWidth = artworkImage.naturalWidth * widthScale * heightScale;
+          artworkImage.style.maxWidth = `${scaledWidth}px`;
+          artworkImage.style.maxHeight = `${scaledHeight}px`;
+        } else {
+          artworkImage.style.maxWidth = `${containerWidth}px`;
+          artworkImage.style.maxHeight = 'none';
+        }
+      }
+  
+      logSectionHeight();
+      adjustLayoutBasedOnDescription(); // Call after adjusting height
+    }
+  
+    function logSectionHeight() {
+      const containerHeight = artworkSection.offsetHeight;
+      const displayHeight = artworkDisplay.offsetHeight;
+      const imageHeight = artworkImage.clientHeight;
+      const naturalHeight = artworkImage.naturalHeight;
+      const scale = artworkImage.clientWidth / artworkImage.naturalWidth || 0;
+      const expectedHeight = naturalHeight * scale;
+      const bottomVisible = imageHeight + artworkImage.offsetTop <= containerHeight;
+      const topVisible = artworkImage.offsetTop >= 0;
+  
+      console.log('Viewport height:', window.innerHeight);
+      console.log('Header height:', document.querySelector('header').offsetHeight);
+      console.log('Metadata height:', metadataSection.offsetHeight);
+      console.log('Artwork section dimensions:', artworkSection.offsetWidth, 'x', containerHeight);
+      console.log('Artwork display dimensions:', artworkDisplay.offsetWidth, 'x', displayHeight);
+      console.log('Image dimensions:', artworkImage.clientWidth, 'x', imageHeight);
+      console.log('Image natural dimensions:', artworkImage.naturalWidth, 'x', naturalHeight);
+      console.log('Image scale:', scale, 'Expected height:', expectedHeight);
+      console.log('Image top offset:', artworkImage.offsetTop, 'Container padding:', getComputedStyle(artworkDisplay).padding);
+      console.log('Top visible:', topVisible, 'Bottom visible:', bottomVisible, 'Overall visible:', artworkImage.offsetWidth > 0 && artworkImage.offsetHeight > 0);
+    }
+  
+    // Function to adjust layout based on description height (mobile, tablet, desktop)
+    function adjustLayoutBasedOnDescription() {
+      const description = document.getElementById('description');
+      const artworkSection = document.querySelector('.artwork-section');
+      const arrowContainer = document.querySelector('.arrow-container');
+  
+      if (!description || !artworkSection || !arrowContainer) {
+        console.error('Missing elements:', { description, artworkSection, arrowContainer });
+        return;
+      }
+  
+      // Get computed styles for accurate line-height
+      const computedStyle = getComputedStyle(description);
+      const fontSize = parseFloat(computedStyle.fontSize) || 12; // Fallback to 12px
+      const lineHeight = parseFloat(computedStyle.lineHeight) || fontSize * (window.innerWidth <= 768 ? 1.4 : 1.6); // 1.4 for mobile, 1.6 for tablet/desktop
+      const descriptionHeight = description.offsetHeight || 0;
+  
+      // Estimate line count (cap at 6 lines to match max-height: 150px)
+      const lineCount = Math.min(Math.round(descriptionHeight / lineHeight) || 1, 6);
+  
+      // Estimate gap (approximate, for debugging)
+      const estimatedGap = descriptionHeight + parseFloat(arrowContainer.style.bottom || getComputedStyle(arrowContainer).bottom);
+  
+      // Log for debugging
+      console.log('Adjusting layout:', {
+        viewportWidth: window.innerWidth,
+        fontSize,
+        lineHeight,
+        descriptionHeight,
+        lineCount,
+        isMobile: window.innerWidth <= 768,
+        isTablet: window.innerWidth > 768 && window.innerWidth <= 999,
+        isDesktop: window.innerWidth > 999,
+        estimatedGap
+      });
+  
+      // Determine breakpoint
+      const isMobile = window.innerWidth <= 768;
+      const isTablet = window.innerWidth > 768 && window.innerWidth <= 999;
+      const isDesktop = window.innerWidth > 999;
+  
+      if (isDesktop) {
+        // Desktop adjustments (≥1000px)
+        let artworkSectionMarginTop = 0; // From CSS: margin-top: 0px
+        let arrowContainerBottom = 12; // From CSS: bottom: 12px
+  
+        let marginAdjustment = 0;
+        let arrowAdjustment = 0;
+        if (lineCount <= 1) {
+          marginAdjustment = -20; // margin-top: -20px
+          arrowAdjustment = 38; // Small gap ~0-5px (bottom: 50px)
+        } else if (lineCount === 2) {
+          marginAdjustment = -15; // margin-top: -15px
+          arrowAdjustment = 8; // bottom: 20px
+        } else if (lineCount === 3) {
+          marginAdjustment = -10; // margin-top: -10px
+          arrowAdjustment = -2; // bottom: 10px
+        } else if (lineCount === 4) {
+          marginAdjustment = -5; // margin-top: -5px
+          arrowAdjustment = -7; // bottom: 5px
+        } else if (lineCount >= 5) {
+          marginAdjustment = 0; // margin-top: 0px
+          arrowAdjustment = -12; // Large gap ~20-30px (bottom: 0px)
+        }
+  
+        artworkSectionMarginTop += marginAdjustment;
+        arrowContainerBottom += arrowAdjustment;
+  
+        artworkSection.style.marginTop = `${artworkSectionMarginTop}px`;
+        arrowContainer.style.bottom = `${arrowContainerBottom}px`;
+  
+        console.log(`Desktop - Lines: ${lineCount}, Margin Adjustment: ${marginAdjustment}px, Margin-top: ${artworkSectionMarginTop}px, Arrow Adjustment: ${arrowAdjustment}px, Arrow Bottom: ${arrowContainerBottom}px, Estimated Gap: ${estimatedGap}px`);
+      } else if (isTablet) {
+        // Tablet adjustments (769px–999px)
+        let artworkSectionMarginTop = -60; // From tablet CSS: margin-top: -60px
+        let arrowContainerBottom = 12; // From tablet CSS: bottom: 12px
+  
+        let marginAdjustment = 0;
+        let arrowAdjustment = 0;
+        if (lineCount <= 1) {
+          marginAdjustment = 10; // margin-top: -50px
+          arrowAdjustment = 38; // Small gap ~0-5px (bottom: 50px)
+        } else if (lineCount === 2) {
+          marginAdjustment = 15; // margin-top: -45px
+          arrowAdjustment = 8; // bottom: 20px
+        } else if (lineCount === 3) {
+          marginAdjustment = 20; // margin-top: -40px
+          arrowAdjustment = -2; // bottom: 10px
+        } else if (lineCount === 4) {
+          marginAdjustment = 25; // margin-top: -35px
+          arrowAdjustment = -7; // bottom: 5px
+        } else if (lineCount >= 5) {
+          marginAdjustment = 30; // margin-top: -30px
+          arrowAdjustment = -12; // Large gap ~20-30px (bottom: 0px)
+        }
+  
+        artworkSectionMarginTop += marginAdjustment;
+        arrowContainerBottom += arrowAdjustment;
+  
+        artworkSection.style.marginTop = `${artworkSectionMarginTop}px`;
+        arrowContainer.style.bottom = `${arrowContainerBottom}px`;
+  
+        console.log(`Tablet - Lines: ${lineCount}, Margin Adjustment: ${marginAdjustment}px, Margin-top: ${artworkSectionMarginTop}px, Arrow Adjustment: ${arrowAdjustment}px, Arrow Bottom: ${arrowContainerBottom}px, Estimated Gap: ${estimatedGap}px`);
+      } else if (isMobile) {
+        // Mobile adjustments (≤768px)
+        let artworkSectionMarginTop = 20; // From mobile CSS: margin: 20px auto 0
+        let arrowContainerBottom = -42; // From mobile CSS: bottom: -42px
+  
+        let marginAdjustment = 0;
+        let arrowAdjustment = 0;
+        if (lineCount <= 1) {
+          marginAdjustment = -65; // margin-top: -45px (20px + -65)
+          arrowAdjustment = -5; // bottom: -47px
+        } else if (lineCount === 2) {
+          marginAdjustment = -60; // margin-top: -40px
+          arrowAdjustment = -3; // bottom: -45px
+        } else if (lineCount === 3) {
+          marginAdjustment = -50; // margin-top: -30px
+          arrowAdjustment = 0; // bottom: -42px
+        } else if (lineCount === 4) {
+          marginAdjustment = -40; // margin-top: -20px
+          arrowAdjustment = -5; // bottom: -47px
+        } else if (lineCount >= 5) {
+          marginAdjustment = -30; // margin-top: -10px
+          arrowAdjustment = -10; // bottom: -52px
+        }
+  
+        artworkSectionMarginTop += marginAdjustment;
+        arrowContainerBottom += arrowAdjustment;
+  
+        artworkSection.style.marginTop = `${artworkSectionMarginTop}px`;
+        arrowContainer.style.bottom = `${arrowContainerBottom}px`;
+  
+        console.log(`Mobile - Lines: ${lineCount}, Margin Adjustment: ${marginAdjustment}px, Margin-top: ${artworkSectionMarginTop}px, Arrow Adjustment: ${arrowAdjustment}px, Arrow Bottom: ${arrowContainerBottom}px, Estimated Gap: ${estimatedGap}px`);
+      }
+    }
+  
+    window.addEventListener('resize', () => {
+      console.log('Resize event triggered');
+      adjustArtworkHeightAndScale();
+    });
+    window.addEventListener('load', () => {
+      console.log('Load event triggered');
+      adjustArtworkHeightAndScale();
+    });
+    artworkImage.addEventListener('load', () => {
+      console.log('Image load event triggered');
+      adjustArtworkHeightAndScale();
+    });
+  
+    function typeWriter(element, text, speed = 100, callback) {
+      if (typingTimeouts.has(element)) {
+        clearTimeout(typingTimeouts.get(element));
+        typingTimeouts.delete(element);
+      }
+  
+      element.textContent = '';
+      let i = 0;
+      function type() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          const timeout = setTimeout(type, speed);
+          typingTimeouts.set(element, timeout);
+        } else {
+          typingTimeouts.delete(element);
+          if (callback) callback();
+        }
+      }
+      type();
+    }
+  
+    function stopTyping() {
+      typingTimeouts.forEach((timeout) => clearTimeout(timeout));
+      typingTimeouts.clear();
+  
+      [totalArtworks, artworkNumber, artworkTitle, artworkYear, artworkType].forEach(el => {
+        el.textContent = '';
+      });
+    }
+  
+    function showSpinner() {
+      loadingSpinner.style.display = 'block';
+      artworkImage.style.display = 'none';
+      artworkDisplay.innerHTML = '';
+      artworkDisplay.appendChild(loadingSpinner);
+      artworkDisplay.appendChild(loadingProgress);
+      artworkDisplay.appendChild(artworkImage);
+    }
+  
+    function hideSpinner() {
+      loadingSpinner.style.display = 'none';
+      artworkImage.style.display = 'block';
+    }
+  
+    function updateArtwork() {
+      stopTyping();
+      const currentArtwork = artworks[currentIndex];
+  
+      totalArtworks.textContent = `${artworks.length}`;
+  
+      typeWriter(artworkNumber, `${currentIndex + 1}`, 50);
+      typeWriter(artworkTitle, currentArtwork.project || 'N/A', 50);
+      typeWriter(artworkYear, currentArtwork.year || 'N/A', 50);
+      typeWriter(artworkType, currentArtwork.type || 'N/A', 50);
+  
+      description.textContent = currentArtwork.description || 'No description available';
+      hideSpinner();
+  
+      artworkImage.alt = currentArtwork.project || 'Artwork';
+  
+      artworkImage.style.animation = 'none';
+      artworkImage.offsetHeight;
+      artworkImage.style.animation = 'fadeIn 0.5s ease-in forwards';
+  
+      if (currentIndex === 0) {
+        arrowLeft.classList.add('disabled');
+        arrowLeftWrapper.classList.add('disabled');
+        hoverLeft.style.cursor = 'default';
+      } else {
+        arrowLeft.classList.remove('disabled');
+        arrowLeftWrapper.classList.remove('disabled');
+        hoverLeft.style.cursor = 'pointer';
+      }
+      if (currentIndex === artworks.length - 1) {
+        arrowRight.classList.add('disabled');
+        arrowRightWrapper.classList.add('disabled');
+        hoverRight.style.cursor = 'default';
+      } else {
+        arrowRight.classList.remove('disabled');
+        arrowRightWrapper.classList.remove('disabled');
+        hoverRight.style.cursor = 'pointer';
+      }
+  
+      artworkSlider.value = currentIndex + 1;
+  
+      preloadImages(); // Preload next/previous images
+  
+      console.log('updateArtwork: Triggering adjustLayoutBasedOnDescription');
+      adjustLayoutBasedOnDescription();
+      adjustArtworkHeightAndScale();
+    }
+  
+    function swipeLeft() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        showSpinner();
+        loadImageWithProgress(artworks[currentIndex].imageurl || 'https://via.placeholder.com/300?text=No+Image', updateArtwork);
+      }
+    }
+  
+    function swipeRight() {
+      if (currentIndex < artworks.length - 1) {
+        currentIndex++;
+        showSpinner();
+        loadImageWithProgress(artworks[currentIndex].imageurl || 'https://via.placeholder.com/300?text=No+Image', updateArtwork);
+      }
+    }
+  
+    arrowLeftWrapper.addEventListener('click', swipeLeft);
+    arrowRightWrapper.addEventListener('click', swipeRight);
+    hoverLeft.addEventListener('click', swipeLeft);
+    hoverRight.addEventListener('click', swipeRight);
+  
+    async function fetchArtworks() {
+      showSpinner();
+      try {
+        const response = await fetch('https://sitoform25.onrender.com/api/artworks');
+        if (!response.ok) throw new Error('Failed to fetch artworks');
+        artworks = await response.json();
+  
+        if (artworks.length === 0) {
+          artworkDisplay.innerHTML = '<p>No artworks found.</p>';
+          hideSpinner();
+          hideProgress();
+          return;
+        }
+  
+        artworks = artworks.map((artwork, index) => ({
+          number: index + 1,
+          project: artwork.project,
+          year: artwork.year,
+          type: artwork.type,
+          description: artwork.description,
+          imageurl: artwork.imageurl
+        }));
+  
+        totalArtworks.textContent = `${artworks.length}`;
+        artworkSlider.max = artworks.length;
+        artworkSlider.value = 1;
+        currentIndex = 0;
+  
+        // Load first image with progress
+        loadImageWithProgress(artworks[currentIndex].imageurl || 'https://via.placeholder.com/300?text=No+Image', () => {
+          updateArtwork();
+          preloadImages(); // Preload adjacent images
+        });
+      } catch (error) {
+        console.error('Error fetching from API:', error);
+        try {
+          const response = await fetch('https://sitoform.com/data/artworks.json');
+          const fallbackData = await response.json();
+  
+          if (fallbackData.length === 0) {
+            artworkDisplay.innerHTML = '<p>No artworks found (fallback).</p>';
+            hideSpinner();
+            hideProgress();
+            return;
+          }
+  
+          artworks = fallbackData.map((artwork, index) => ({
+            number: index + 1,
+            project: artwork.project,
+            year: artwork.year,
+            type: artwork.type,
+            description: artwork.description,
+            imageurl: artwork.imageurl
+          }));
+  
+          totalArtworks.textContent = `${artworks.length}`;
+          artworkSlider.max = artworks.length;
+          artworkSlider.value = 1;
+          currentIndex = 0;
+  
+          loadImageWithProgress(artworks[currentIndex].imageurl || 'https://via.placeholder.com/300?text=No+Image', () => {
+            updateArtwork();
+            preloadImages();
+          });
+        } catch (fallbackError) {
+          console.error('Error fetching fallback artworks.json:', fallbackError);
+          artworkDisplay.innerHTML = '<p>Error loading artworks.</p>';
+          hideSpinner();
+          hideProgress();
+        }
+      }
+    }
+  
+    fetchArtworks();
+  </script>
+</body>
+</html>

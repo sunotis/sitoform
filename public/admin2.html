@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .login-container, .admin-container { max-width: 800px; margin: auto; }
+    .error { color: red; }
+    .artwork-list { list-style: none; padding: 0; }
+    .artwork-item { padding: 10px; border: 1px solid #ccc; margin-bottom: 10px; cursor: move; }
+    .artwork-item.dragging { opacity: 0.5; }
+    .edit-form { display: none; margin-top: 10px; padding: 10px; border: 1px solid #ccc; }
+    .edit-form.active { display: block; }
+    .edit-form input,
+    .edit-form textarea { pointer-events: auto; }
+    .upload-form { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; }
+    button { margin-right: 5px; }
+    .artwork-list.no-drag .artwork-item { cursor: default; }
+    .artwork-meta {
+      font-size: 0.85em;
+      color: #666;
+      margin-left: 5px;
+    }
+    .image-preview {
+      background-color: #000;
+      padding: 5px;
+      display: inline-block;
+      margin-top: 5px;
+    }
+    .image-preview img {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container" id="loginContainer">
+    <h2>Admin Login</h2>
+    <form id="loginForm">
+      <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" required>
+      </div>
+      <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" required>
+      </div>
+      <button type="submit">Login</button>
+      <p class="error" id="loginError"></p>
+    </form>
+  </div>
+
+  <div class="admin-container" id="adminContainer" style="display: none;">
+    <h2>Admin Panel</h2>
+    <button id="logoutBtn">Logout</button>
+    <h3>Create New Artwork</h3>
+    <form id="uploadForm" class="upload-form">
+      <div>
+        <label for="project">Project:</label>
+        <input type="text" id="project">
+      </div>
+      <div>
+        <label for="year">Year (e.g., 2018 - NOW):</label>
+        <input type="text" id="year">
+      </div>
+      <div>
+        <label for="type">Type:</label>
+        <input type="text" id="type">
+      </div>
+      <div>
+        <label for="description">Description:</label>
+        <textarea id="description"></textarea>
+      </div>
+      <div>
+        <label for="image">Image:</label>
+        <input type="file" id="image" accept="image/*" required>
+      </div>
+      <button type="submit">Upload</button>
+      <p class="error" id="uploadError"></p>
+    </form>
+    <h3>Artworks</h3>
+    <ul class="artwork-list" id="artworkList"></ul>
+  </div>
+
+  <script>
+    const supabaseUrl = 'https://ydfkrwjafnuvdvezpkcp.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkZmtyd2phZm51dmR2ZXpwa2NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxNzA0MTUsImV4cCI6MjA2MDc0NjQxNX0.kHzI8KRGFBRrLpFVvJfK2JP_P2a9nRJzDBm5h235eJw';
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+    const loginContainer = document.getElementById('loginContainer');
+    const adminContainer = document.getElementById('adminContainer');
+    const loginForm = document.getElementById('loginForm');
+    const loginError = document.getElementById('loginError');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const artworkList = document.getElementById('artworkList');
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadError = document.getElementById('uploadError');
+
+    let sortableInstance = null;
+
+    async function checkSession() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session) {
+        loginContainer.style.display = 'none';
+        adminContainer.style.display = 'block';
+        fetchArtworks();
+      } else {
+        console.log('No active session found');
+      }
+    }
+    checkSession();
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        loginContainer.style.display = 'none';
+        adminContainer.style.display = 'block';
+        console.log('Login successful');
+        fetchArtworks();
+      } catch (error) {
+        console.error('Login error:', error);
+        loginError.textContent = error.message;
+      }
+    });
+
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await supabaseClient.auth.signOut();
+        loginContainer.style.display = 'block';
+        adminContainer.style.display = 'none';
+        artworkList.innerHTML = '';
+        console.log('Logout successful');
+      } catch (error) {
+        console.error('Logout error:', error);
+        alert('Failed to logout: ' + error.message);
+      }
+    });
+
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append('project', document.getElementById('project').value);
+      formData.append('year', document.getElementById('year').value);
+      formData.append('type', document.getElementById('type').value);
+      formData.append('description', document.getElementById('description').value);
+      formData.append('image', document.getElementById('image').files[0]);
+
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) throw new Error('Not authenticated');
+
+        console.log('Uploading artwork...');
+        const response = await fetch('https://sitoform25.onrender.com/api/artworks', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: formData
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to upload artwork');
+        }
+
+        alert('Artwork uploaded successfully');
+        uploadForm.reset();
+        fetchArtworks();
+      } catch (error) {
+        console.error('Error uploading artwork:', error);
+        uploadError.textContent = error.message;
+      }
+    });
+
+    function isEditModeActive() {
+      return document.querySelector('.edit-form.active') !== null;
+    }
+
+    async function fetchArtworks() {
+      try {
+        const response = await fetch('https://sitoform25.onrender.com/api/artworks');
+        if (!response.ok) throw new Error('Failed to fetch artworks');
+        const data = await response.json();
+        artworkList.innerHTML = '';
+        data.forEach((artwork, index) => {
+          const li = document.createElement('li');
+          li.className = 'artwork-item';
+          li.setAttribute('data-id', artwork.id);
+          li.innerHTML = `
+            <strong>#${index + 1}</strong> ${artwork.project || 'No project'} 
+            <span class="artwork-meta">(${artwork.year || 'No year'}, ${artwork.type || 'No type'})</span>
+            <br>
+            <div class="image-preview">
+              <img src="${artwork.imageurl}" alt="${artwork.project || 'Artwork'}" style="max-width: 50px; max-height: 50px;">
+            </div>
+            <button class="edit-btn" data-id="${artwork.id}">Edit</button>
+            <button class="delete-btn" data-id="${artwork.id}">Delete</button>
+            <div class="edit-form" id="edit-form-${artwork.id}">
+              <input type="text" id="edit-project-${artwork.id}" value="${artwork.project || ''}" placeholder="Project">
+              <input type="text" id="edit-year-${artwork.id}" value="${artwork.year || ''}" placeholder="Year (e.g., 2018 - NOW)">
+              <input type="text" id="edit-type-${artwork.id}" value="${artwork.type || ''}" placeholder="Type">
+              <textarea id="edit-description-${artwork.id}" placeholder="Description">${artwork.description || ''}</textarea>
+              <input type="text" id="edit-imageurl-${artwork.id}" value="${artwork.imageurl || ''}" placeholder="Image URL">
+              <div>
+                <label for="edit-image-${artwork.id}">Replace Image:</label>
+                <input type="file" id="edit-image-${artwork.id}" accept="image/*">
+                <button type="button" onclick="uploadNewImage(${artwork.id})">Upload New Image</button>
+              </div>
+              <button onclick="saveEdit(${artwork.id})">Save</button>
+              <button onclick="cancelEdit(${artwork.id})">Cancel</button>
+            </div>
+          `;
+          artworkList.appendChild(li);
+        });
+
+        if (sortableInstance) {
+          sortableInstance.destroy();
+        }
+
+        sortableInstance = new Sortable(artworkList, {
+          animation: 150,
+          handle: '.artwork-item',
+          onStart: () => {
+            console.log('Drag started. Edit mode active:', isEditModeActive());
+            if (isEditModeActive()) {
+              return false;
+            }
+          },
+          onEnd: async (evt) => {
+            if (isEditModeActive()) return;
+
+            const items = Array.from(artworkList.children);
+            const order = items.map((item, index) => ({
+              id: parseInt(item.getAttribute('data-id')),
+              order: index + 1
+            }));
+            console.log('Order to save:', order);
+
+            try {
+              const { data: { session } } = await supabaseClient.auth.getSession();
+              if (!session) throw new Error('Not authenticated');
+
+              const response = await fetch('https://sitoform25.onrender.com/api/artworks/reorder', {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({ order })
+              });
+
+              if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to update order');
+              }
+
+              console.log('Order saved successfully');
+              fetchArtworks();
+            } catch (error) {
+              console.error('Error updating order:', error);
+              alert('Failed to update order: ' + error.message);
+            }
+          }
+        });
+
+        document.querySelectorAll('.edit-btn').forEach(button => {
+          button.addEventListener('click', () => {
+            const id = button.getAttribute('data-id');
+            const editForm = document.getElementById(`edit-form-${id}`);
+            editForm.classList.toggle('active');
+            const editModeActive = isEditModeActive();
+            console.log('Edit mode toggled. Active:', editModeActive);
+            if (editModeActive) {
+              sortableInstance.option('disabled', true);
+              artworkList.classList.add('no-drag');
+            } else {
+              sortableInstance.option('disabled', false);
+              artworkList.classList.remove('no-drag');
+            }
+          });
+        });
+
+        document.querySelectorAll('.delete-btn').forEach(button => {
+          button.addEventListener('click', async () => {
+            const id = button.getAttribute('data-id');
+            if (confirm('Are you sure you want to delete this artwork?')) {
+              try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) throw new Error('Not authenticated');
+
+                const response = await fetch(`https://sitoform25.onrender.com/api/artworks/${id}`, {
+                  method: 'DELETE',
+                  headers: {
+                    'Authorization': `Bearer ${session.access_token}`
+                  }
+                });
+
+                if (!response.ok) {
+                  const errorData = await response.json();
+                  throw new Error(errorData.error || 'Failed to delete artwork');
+                }
+
+                alert('Artwork deleted successfully');
+                fetchArtworks();
+              } catch (error) {
+                console.error('Error deleting artwork:', error);
+                alert('Failed to delete artwork: ' + error.message);
+              }
+            }
+          });
+        });
+
+        if (isEditModeActive()) {
+          sortableInstance.option('disabled', true);
+          artworkList.classList.add('no-drag');
+        } else {
+          sortableInstance.option('disabled', false);
+          artworkList.classList.remove('no-drag');
+        }
+      } catch (error) {
+        console.error('Error fetching artworks:', error);
+        artworkList.innerHTML = '<li>Error loading artworks</li>';
+      }
+    }
+
+    async function uploadNewImage(id) {
+      const imageFile = document.getElementById(`edit-image-${id}`).files[0];
+      if (!imageFile) {
+        alert('Please select an image to upload.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('image', imageFile);
+
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) throw new Error('Not authenticated');
+
+        const response = await fetch(`https://sitoform25.onrender.com/api/artworks/${id}`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: formData
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to upload new image');
+        }
+
+        const result = await response.json();
+        document.getElementById(`edit-imageurl-${id}`).value = result.imageurl;
+        alert('Image updated successfully');
+        await fetchArtworks();
+      } catch (error) {
+        console.error('Error uploading new image:', error);
+        alert('Failed to upload new image: ' + error.message);
+      }
+    }
+
+    async function saveEdit(id) {
+      const updates = {
+        project: document.getElementById(`edit-project-${id}`).value,
+        year: document.getElementById(`edit-year-${id}`).value,
+        type: document.getElementById(`edit-type-${id}`).value,
+        description: document.getElementById(`edit-description-${id}`).value,
+        imageurl: document.getElementById(`edit-imageurl-${id}`).value
+      };
+
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) throw new Error('Not authenticated');
+
+        console.log('Saving edit for artwork:', id, updates);
+        const response = await fetch(`https://sitoform25.onrender.com/api/artworks/${id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify(updates)
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to update artwork');
+        }
+
+        alert('Artwork updated successfully');
+        document.getElementById(`edit-form-${id}`).classList.remove('active');
+        sortableInstance.option('disabled', false);
+        artworkList.classList.remove('no-drag');
+        fetchArtworks();
+      } catch (error) {
+        console.error('Error updating artwork:', error);
+        alert('Failed to update artwork: ' + error.message);
+      }
+    }
+
+    function cancelEdit(id) {
+      document.getElementById(`edit-form-${id}`).classList.remove('active');
+      if (!isEditModeActive()) {
+        sortableInstance.option('disabled', false);
+        artworkList.classList.remove('no-drag');
+      }
+    }
+  </script>
+</body>
+</html>

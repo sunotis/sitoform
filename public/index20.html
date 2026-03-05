@@ -1,0 +1,2956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sito Schwarzenberger GRAPHIC DESIGN Sitoform</title>
+  <!-- Load the local Tailwind CSS file -->
+  <link href="/css/output.css" rel="stylesheet">
+  <!-- Inter Font from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Reset and base styles */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      overflow-y: scroll; /* Force scrollbar to prevent layout shifts */
+    }
+  
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+  
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #343333;
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      font-weight: 400; /* Standard weight for body text */
+    }
+  
+    /* Header */
+    header {
+      z-index: 1000;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0;
+      width: 100%;
+      background: transparent !important;
+    }
+  
+    .header-content {
+      position: relative;
+      max-width: 1000px;
+      margin: 0 auto;
+      min-height: 133px;
+      padding: 18px 40px;
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+  
+    /* Hidden class */
+    .hidden,
+    #main-content.hidden,
+    #biography-content.hidden,
+    #visuals-content.hidden,
+    #contact-content.hidden {
+      display: none !important;
+    }
+  
+    /* Loading styles for spinner and progress */
+    #loading-spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      display: none;
+    }
+  
+    #loading-spinner svg {
+      width: 40px;
+      height: 40px;
+      color: #009FE3;
+      animation: spin 1s linear infinite !important;
+      transform-origin: center;
+    }
+  
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  
+    #loading-progress {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 20;
+      text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+    }
+  
+    .loading-active #loading-spinner {
+      display: block !important;
+      opacity: 1 !important;
+    }
+  
+    .loading-active #loading-progress {
+      display: none;
+    }
+  
+    .loading-active.progress-visible #loading-spinner {
+      display: none;
+    }
+  
+    .loading-active.progress-visible #loading-progress {
+      display: block;
+      opacity: 1;
+    }
+  
+    :not(.loading-active) #loading-progress {
+      display: none !important;
+    }
+  
+    .loading-active #artwork-image {
+      display: none;
+    }
+  
+    /* Artwork Slider */
+    section.artwork-section {
+      background-color: #343333;
+      max-width: 1000px;
+      min-height: 200px;
+      min-width: 250px;
+      margin: 0 auto;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+      overflow: hidden;
+      transition: margin-top 0.3s ease;
+    }
+  
+    .artwork-display {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      box-sizing: border-box;
+      z-index: 5;
+    }
+  
+    .artwork-display img {
+      max-width: 100%;
+      object-fit: contain;
+      object-position: top;
+      opacity: 0;
+    }
+  
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  
+    #artwork-image {
+      opacity: 0;
+      animation: fadeIn 0.5s ease-in forwards;
+    }
+  
+    .blue-line {
+      height: 3px;
+      background-color: #009FE3;
+      width: 1000px;
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+    }
+  
+    .vertical-line {
+      width: 2px;
+      height: 26px;
+      background-color: white;
+    }
+  
+    .short-vertical-line {
+      width: 2px;
+      height: 36px;
+      background-color: white;
+    }
+  
+    .metadata-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      width: 100%;
+    }
+  
+    .metadata-section {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      max-width: 1000px;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 60px;
+      z-index: 10;
+    }
+  
+    .metadata-row {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+    }
+  
+    .metadata-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+      margin-left: 0;
+    }
+  
+    .metadata-item.text-left {
+      width: 50px;
+      min-width: 50px;
+      flex-shrink: 0;
+      text-align: left;
+      margin-left: 0;
+    }
+  
+    .metadata-item.project-item {
+      margin-left: 35px;
+      width: 240px;
+      flex-shrink: 0;
+    }
+  
+    .metadata-item.year-item {
+      position: absolute;
+      left: 360px;
+      width: 240px;
+      margin-left: 50px;
+    }
+  
+    .metadata-item.type-item {
+      position: absolute;
+      left: 625px;
+      width: 240px;
+    }
+  
+    .metadata-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      height: 36px;
+      margin-left: -40px;
+      align-content: flex-start;
+    }
+  
+    .metadata-group .text-wrapper {
+      margin-left: 20px;
+      width: 255px;
+      min-height: 36px;
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      align-content: flex-start;
+      margin-top: 0;
+    }
+  
+    .number-align {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      height: 36px;
+      justify-content: space-between;
+      margin-left: 0;
+      font-family: 'Courier New', monospace;
+    }
+  
+    .description-wrapper {
+      margin-left: 67px;
+      width: 820px;
+      margin-top: 55px;
+    }
+  
+    .arrow-container {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      transition: bottom 0.3s ease;
+    }
+  
+    .arrow-wrapper {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 15;
+    }
+  
+    .arrow {
+      height: 10px;
+      width: auto;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+  
+    .arrow-left {
+      transform: rotate(180deg);
+      margin-right: 30px;
+    }
+  
+    .arrow-right {
+      transform: rotate(0deg);
+      margin-left: 30px;
+    }
+  
+    .arrow.disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+  
+    .arrow-wrapper:not(.disabled):hover .arrow-left {
+      transform: rotate(180deg) scale(1.2);
+    }
+  
+    .arrow-wrapper:not(.disabled):hover .arrow-right {
+      transform: rotate(0deg) scale(1.2);
+    }
+  
+    .slider-wrapper {
+      flex-grow: 1;
+      position: relative;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+      margin: 15px;
+    }
+  
+    #artwork-slider {
+      width: 100%;
+      height: 3px;
+      background: transparent;
+      -webkit-appearance: none;
+      appearance: none;
+      outline: none;
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  
+    #artwork-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 11px;
+      height: 11px;
+      background: white;
+      border: none;
+      opacity: 0.05;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+  
+    #artwork-slider::-moz-range-thumb {
+      width: 11px;
+      height: 11px;
+      background: white;
+      border: none;
+      opacity: 0.05;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+  
+    #artwork-slider::-webkit-slider-thumb:hover,
+    #artwork-slider::-moz-range-thumb:hover {
+      transform: scale(1.2);
+    }
+  
+    .hover-area {
+      position: fixed;
+      top: 0;
+      height: 100%;
+      width: 45%;
+      z-index: 5;
+      cursor: pointer;
+    }
+  
+    .hover-area.hidden {
+      display: none;
+    }
+  
+    .hover-left { left: 0; }
+    .hover-right { right: 0; }
+  
+    /* Header text styles */
+    .owner {
+      font-size: 14px;
+      font-weight: 700; /* Bold for header owner */
+      color: #575756;
+      line-height: 1;
+    }
+  
+    .ownersub1 {
+      font-size: 14px;
+      font-weight: 300; /* Lighter for subtext */
+      color: #575756;
+      line-height: 1;
+    }
+  
+    .ownersub2 {
+      font-size: 14px;
+      font-weight: 200; /* Very light for subtext */
+      color: #575756;
+      line-height: 1;
+    }
+  
+    .headerlinks {
+      font-size: 14px;
+      font-weight: 400; /* Standard for nav links */
+      color: white;
+    }
+  
+    .headerlinks.active {
+      text-decoration: underline;
+    }
+  
+    .artlink {
+      font-size: 14px;
+      font-weight: 700; /* Bold for art link */
+      color: white;
+    }
+  
+    .category {
+      font-size: 12px;
+      font-weight: 400; /* Standard for metadata */
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+  
+    .projectdata {
+      font-size: 16px;
+      font-weight: 700; /* Bold for project data */
+      line-height: 2;
+      color: white;
+    }
+  
+    .description {
+      font-size: 14px;
+      font-weight: 400; /* Standard for description */
+      line-height: 200;
+      max-width: 433px;
+      color: white;
+    }
+  
+    #description {
+      column-count: 2;
+      column-width: 400px;
+      column-gap: 20px;
+      column-fill: auto;
+      height: auto;
+      max-height: 108px;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 400; /* Standard */
+      color: white;
+      white-space: pre-wrap;
+    }
+  
+    #total-artworks {
+      font-size: 14px;
+      font-weight: 400; /* Standard */
+      line-height: 1;
+      color: white;
+      margin-top: -1px;
+    }
+  
+    #artwork-number {
+      margin-top: 1px;
+      font-weight: 400; /* Standard */
+    }
+  
+    .header-text {
+      margin-top: -3px;
+    }
+  
+    .header-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 28px;
+    }
+  
+    .logo {
+      flex-shrink: 0;
+      margin-left: -14px;
+    }
+  
+    .logo img {
+      width: 210px;
+      height: 75px;
+    }
+  
+    .header-text-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-top: 3px;
+    }
+  
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      padding-top: 8px;
+    }
+  
+    .art-link {
+      margin-left: auto;
+      padding-top: 3px;
+    }
+  
+    .w-full.py-4 {
+      position: relative;
+      min-height: 200px;
+      padding-bottom: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      overflow: visible !important;
+    }
+  
+    .year-type-row {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+  
+    /* Content Containers */
+    #main-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 120px 0 20px;
+    }
+  
+    #visuals-content {
+      min-height: 100vh;
+      overflow-y: auto;
+      padding: 120px 0 20px;
+    }
+  
+    #biography-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 120px 0 20px;
+    }
+  
+    #contact-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 120px 0 20px;
+    }
+  
+    /* Visuals Section */
+    .visuals-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 25px;
+    }
+  
+    .visuals-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+  
+    .visuals-image {
+      width: 100%;
+      max-width: 720px;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+    }
+  
+    .visuals-image.lazy:not([data-src]) {
+      background-color: #2a2a2a;
+      min-height: 200px;
+    }
+  
+    .visuals-video {
+      position: relative;
+      width: 100%;
+      max-width: 720px;
+      padding-bottom: 56.25%;
+      height: 0;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+  
+    .visuals-video iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  
+    .visuals-video iframe[data-src] {
+      background-color: #2a2a2a;
+    }
+  
+    .visuals-video iframe:not([data-src]) {
+      background-color: transparent;
+    }
+  
+    /* Biography styles */
+    .bio-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 0 0 25px;
+    }
+  
+    .bio-section {
+      display: flex;
+      gap: 50px;
+      margin-bottom: 50px;
+      margin-top: 20px;
+    }
+  
+    .bio-image-container {
+      position: relative;
+      width: 238px;
+      height: 317px;
+      flex-shrink: 0;
+    }
+  
+    .bio-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  
+    .bio-image-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      z-index: -1;
+    }
+  
+    .bio-text-column {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+  
+    .bio-text {
+      max-width: 433px;
+      font-size: 14px;
+      font-weight: 400; /* Standard */
+      line-height: 1.5;
+    }
+  
+    .bio-line {
+      height: 1px;
+      background: rgb(76, 76, 76);
+      width: 288px;
+      margin: 50px 0;
+    }
+  
+    .diploma-section {
+      display: flex;
+      gap: 50px;
+      margin-bottom: 50px;
+    }
+  
+    .diploma-image-container {
+      width: 238px;
+      height: 317px;
+      flex-shrink: 0;
+    }
+  
+    .diploma-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  
+    .diploma-text {
+      max-width: 433px;
+      font-weight: 400; /* Standard */
+    }
+  
+    .interview-section,
+    .award-section {
+      max-width: 433px;
+      margin-left: 288px;
+      margin-bottom: 50px;
+      font-weight: 400; /* Standard */
+    }
+  
+    .social-links {
+      display: flex;
+      gap: 15px;
+      margin-top: 166px;
+      z-index: 20;
+      position: relative;
+    }
+  
+    .social-icon {
+      width: 25px;
+      height: 25px;
+    }
+  
+   /* Contact styles */
+.contact-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 0 0 25px;
+  position: relative;
+  min-height: 200px; /* Ensure stable height */
+}
+
+.contact-text {
+  max-width: 433px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  position: static;
+  margin: 0; /* Prevent margin collapse */
+}
+
+.contact-text a {
+  color: #009FE3;
+  text-decoration: underline;
+}
+
+.contact-text a:hover {
+  color: white;
+}
+
+.legal-button {
+  font-size: 14px;
+  font-weight: 400;
+  color: #009FE3;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-top: 20px;
+  display: inline-block;
+}
+
+.legal-button:hover {
+  color: white;
+}
+
+.legal-text {
+  max-width: 433px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  position: absolute;
+  top: 100%;
+  left: 25px;
+  display: none;
+  transition: opacity 0.3s ease;
+  opacity: 0;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.legal-text.visible {
+  display: block;
+  opacity: 1;
+  top: 100% !important;
+}
+
+.legal-text h1 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.legal-text h2 {
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
+
+.legal-text p {
+  margin-bottom: 10px;
+}
+
+.legal-text ul {
+  list-style-type: disc;
+  margin-left: 20px;
+  margin-bottom: 10px;
+}
+
+.legal-text li {
+  margin-bottom: 5px;
+}
+
+.legal-text a {
+  color: #009FE3;
+  text-decoration: underline;
+}
+
+.legal-text a:hover {
+  color: white;
+}
+
+/* Tablet media query (769px–999px) */
+@media (min-width: 769px) and (max-width: 999px) {
+  .contact-container {
+    width: 90%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 30px 0;
+    min-height: 200px;
+  }
+
+  .contact-text {
+    max-width: 100%;
+    font-size: 12px;
+    line-height: 1.6;
+    font-weight: 400;
+    margin: 0;
+  }
+
+  .legal-button {
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .legal-text {
+    max-width: 100%;
+    font-size: 11px;
+    line-height: 1.6;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .legal-text.visible {
+    top: 100% !important;
+  }
+
+  .legal-text h1 {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .legal-text h2 {
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+/* Mobile media query (≤768px) */
+@media (max-width: 768px) {
+  .contact-container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px 0;
+    min-height: 200px;
+  }
+
+  .contact-text {
+    max-width: 100%;
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: 400;
+    margin: 0;
+  }
+
+  .legal-button {
+    font-size: 11px;
+    font-weight: 400;
+  }
+
+  .legal-text {
+    max-width: 100%;
+    font-size: 10px;
+    line-height: 1.4;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .legal-text.visible {
+    top: 100% !important;
+  }
+
+  .legal-text h1 {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .legal-text h2 {
+    font-size: 12px;
+    font-weight: 500;
+  }
+}
+  
+    /* Fallback for Tailwind classes */
+    .text-xl {
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 400; /* Standard */
+    }
+  
+    .text-lg {
+      font-size: 14px;
+      line-height: 1.5;
+      font-weight: 400; /* Standard */
+    }
+  
+    .font-bold {
+      font-weight: 700; /* Bold */
+    }
+  
+    .font-light {
+      font-weight: 300; /* Lighter, used sparingly */
+    }
+  
+    /* Tablet media query (769px–999px) */
+    @media (min-width: 769px) and (max-width: 999px) {
+      header {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0;
+        width: 100%;
+      }
+  
+      .header-content {
+        padding: 18px 65px;
+        min-height: 120px;
+      }
+  
+      #main-content,
+      #visuals-content,
+      #biography-content,
+      #contact-content {
+        padding: 110px 0 15px;
+      }
+  
+      .blue-line {
+        width: 90%;
+        max-width: 960px;
+      }
+  
+      .metadata-container {
+        width: 90%;
+      }
+  
+      .metadata-section {
+        position: static;
+        max-width: 100%;
+        margin: 0 auto;
+        transform: none;
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+        padding: 0 0 5px 0;
+      }
+  
+      .metadata-row {
+        flex-direction: row;
+        gap: 10px;
+      }
+  
+      .metadata-item {
+        position: static;
+        width: auto;
+        max-width: none;
+        margin-left: 0;
+        margin-bottom: 0;
+      }
+  
+      .metadata-item.text-left {
+        width: 50px;
+        min-width: 50px;
+      }
+  
+      .metadata-item.project-item {
+        margin-left: 0;
+        width: 200px;
+      }
+  
+      .metadata-item.year-item,
+      .metadata-item.type-item {
+        width: 200px;
+      }
+  
+      .metadata-group {
+        margin-left: 0;
+        height: auto;
+        flex-wrap: nowrap;
+        gap: 8px;
+      }
+  
+      .metadata-group .text-wrapper {
+        margin-left: 0;
+        width: calc(100% - 10px);
+        max-width: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+  
+      .number-align {
+        height: auto;
+      }
+  
+      .description-wrapper {
+        margin-left: 0;
+        width: 100%;
+        margin-top: 5px;
+      }
+  
+      .description {
+        font-size: 12px;
+        line-height: 1.6;
+        font-weight: 400; /* Standard */
+      }
+  
+      #description {
+        column-count: 1;
+        max-width: 100%;
+        max-height: 150px;
+        font-size: 12px;
+        line-height: 1.6;
+        font-weight: 400; /* Standard */
+      }
+  
+      .arrow-container {
+        width: 90%;
+        max-width: 960px;
+      }
+  
+      section.artwork-section {
+        max-width: 90%;
+        margin: 0 auto;
+      }
+  
+      .year-type-row {
+        flex-direction: row;
+        gap: 10px;
+      }
+  
+      .w-full.py-4 {
+        padding-top: 0;
+        padding-bottom: 20px;
+      }
+  
+      .bio-container,
+      .contact-container {
+        width: 90%;
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 30px 0;
+      }
+  
+      .bio-section {
+        flex-direction: column;
+        gap: 50px;
+        margin-bottom: 50px;
+      }
+  
+      .bio-text-column {
+        gap: 50px;
+      }
+  
+      .bio-text,
+      .contact-text {
+        max-width: 100%;
+        font-size: 12px;
+        line-height: 1.6;
+        font-weight: 400; /* Standard */
+      }
+  
+      .bio-image-container {
+        width: 200px;
+        height: 266px;
+      }
+  
+      .bio-line {
+        width: 100%;
+        margin: 50px 0;
+      }
+  
+      .diploma-section {
+        flex-direction: column;
+        gap: 50px;
+      }
+  
+      .diploma-image-container {
+        width: 200px;
+        height: 266px;
+      }
+  
+      .diploma-text {
+        max-width: 100%;
+        font-weight: 400; /* Standard */
+      }
+  
+      .interview-section,
+      .award-section {
+        margin-left: 0;
+        max-width: 100%;
+        margin-bottom: 50px;
+        font-weight: 400; /* Standard */
+      }
+  
+      .social-links {
+        margin-left: 0;
+        margin-top: 50px;
+      }
+  
+      .social-icon {
+        width: 28px;
+        height: 28px;
+      }
+  
+      .legal-button {
+        font-size: 12px;
+        font-weight: 400; /* Standard */
+      }
+  
+      .legal-text {
+        max-width: 100%;
+        font-size: 11px;
+        line-height: 1.6;
+        font-weight: 400; /* Standard */
+        position: absolute;
+        top: 100%;
+        left: 0;
+      }
+  
+      .legal-text h1 {
+        font-size: 16px;
+        font-weight: 700;
+      }
+  
+      .legal-text h2 {
+        font-size: 14px;
+        font-weight: 500;
+      }
+  
+      .visuals-container {
+        width: 90%;
+        max-width: 960px;
+        padding: 30px 0;
+      }
+  
+      .visuals-grid {
+        gap: 30px;
+        margin-bottom: 30px;
+      }
+  
+      .visuals-image {
+        max-width: 600px;
+      }
+  
+      .visuals-video {
+        max-width: 600px;
+      }
+    }
+  
+    .contact-container {
+    width: 90%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 30px 0;
+  }
+
+  .contact-text {
+    max-width: 100%;
+    font-size: 12px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  .legal-button {
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .legal-text {
+    max-width: 100%;
+    font-size: 11px;
+    line-height: 1.6;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .legal-text.visible {
+    top: 100% !important;
+  }
+
+  .legal-text h1 {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .legal-text h2 {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+    /* Mobile media query (≤768px) */
+    @media (max-width: 768px) {
+      header {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0;
+        width: 100%;
+      }
+  
+      .header-content {
+        width: 90%;
+        margin: 0 auto;
+        padding: 10px 0;
+        min-height: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        background: transparent !important;
+      }
+  
+      #main-content,
+      #visuals-content,
+      #biography-content,
+      #contact-content {
+        padding: 100px 0 10px;
+      }
+  
+      .blue-line {
+        width: calc(100% * (90 / 90));
+        bottom: -8px;
+        z-index: 100;
+      }
+  
+      .header-top {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 10px;
+      }
+  
+      .header-text-nav {
+        flex-direction: column;
+        gap: 0;
+        order: unset;
+        width: auto;
+        margin-top: 0;
+        padding-top: 4px;
+      }
+  
+      .logo {
+        margin-left: 0;
+      }
+  
+      .logo img {
+        width: 153px;
+        height: auto;
+      }
+  
+      .header-text {
+        font-size: 11px;
+      }
+  
+      .owner,
+      .ownersub1,
+      .ownersub2 {
+        font-size: 11px;
+        line-height: 1.1;
+      }
+  
+      .art-link {
+        font-size: 12px;
+        margin-left: auto;
+      }
+  
+      .nav-links {
+        flex-direction: row;
+        gap: 1px;
+        width: auto;
+        justify-content: flex-start;
+      }
+  
+      .headerlinks {
+        font-size: 11px;
+        font-weight: 400; /* Standard */
+      }
+  
+      .metadata-container {
+        width: 100%;
+        max-width: 90%;
+        margin: 0 auto;
+        position: relative;
+        overflow: visible !important;
+      }
+  
+      .metadata-section {
+        position: static !important;
+        transform: none !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        margin-top: -50px !important;
+        flex-direction: column;
+        padding: 10px 0;
+        gap: 10px;
+        display: flex !important;
+        visibility: visible !important;
+        z-index: 150 !important;
+        height: auto;
+        overflow: visible;
+      }
+  
+      .metadata-row {
+        flex-direction: row;
+        gap: 8px;
+        width: 100%;
+        align-items: flex-start;
+        flex-wrap: nowrap;
+        margin-left: 0 !important;
+      }
+  
+      .metadata-item {
+        position: static !important;
+        left: auto !important;
+        margin-bottom: 0;
+        margin-left: 0 !important;
+        flex-shrink: 0;
+      }
+  
+      .metadata-item.text-left {
+        width: 40px;
+        min-width: 40px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0;
+        flex-shrink: 0;
+      }
+  
+      .metadata-item.project-item {
+        flex: 1 1 0;
+        min-width: 0;
+        max-width: calc(100% - 48px);
+        margin-left: 0 !important;
+      }
+  
+      .metadata-group .short-vertical-line {
+        margin-right: 5px;
+      }
+  
+      .year-type-row {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        width: 100%;
+        margin-left: 48px;
+        margin-top: -10px;
+      }
+  
+      .metadata-item.year-item,
+      .metadata-item.type-item {
+        width: calc(50% - 5px);
+        max-width: none;
+        margin-left: 0;
+      }
+  
+      .metadata-group {
+        margin-left: 0;
+        height: auto;
+        width: 100%;
+        flex-wrap: nowrap;
+        gap: 3px;
+      }
+  
+      .metadata-group .text-wrapper {
+        margin-left: 5px;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        flex-shrink: 1;
+        white-space: normal;
+        overflow-wrap: break-word;
+        margin-top: -2px;
+      }
+  
+      .projectdata {
+        font-size: 12px;
+        line-height: 1.5;
+        font-weight: 700; /* Bold */
+      }
+  
+      .number-align {
+        align-items: flex-start;
+        margin-left: 0;
+        height: auto;
+        font-size: 12px;
+      }
+  
+      .description-wrapper {
+        margin-left: 0;
+        width: 100%;
+        margin-top: 0;
+        padding: 0;
+      }
+  
+      .description {
+        font-size: 12px;
+        line-height: 1.4;
+        font-weight: 400; /* Standard */
+      }
+  
+      #description {
+        column-count: 1;
+        max-width: 100%;
+        height: auto;
+        max-height: 150px;
+        font-size: 12px;
+        line-height: 1.4;
+        font-weight: 400; /* Standard */
+      }
+  
+      .short-vertical-line {
+        height: 27px;
+      }
+  
+      section.artwork-section {
+        max-width: 90%;
+        min-height: 150px;
+        min-width: 200px;
+        margin: 0 auto;
+      }
+  
+      .artwork-display {
+        width: 100%;
+        height: 100%;
+        padding: 5px;
+        align-items: flex-start;
+      }
+  
+      .artwork-display img {
+        max-width: 100%;
+        object-position: top;
+      }
+  
+      .arrow-container {
+        bottom: -42px;
+        width: calc(100% * (90 / 90));
+        left: 50%;
+        transform: translateX(-50%);
+        height: 40px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+  
+      .arrow-wrapper {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+  
+      .arrow {
+        height: 14px;
+      }
+  
+      .arrow-left {
+        margin-right: 28px;
+      }
+  
+      .arrow-right {
+        margin-left: 28px;
+      }
+  
+      .arrow-wrapper:not(.disabled):hover .arrow-left {
+        transform: rotate(180deg) scale(1.2);
+      }
+  
+      .arrow-wrapper:not(.disabled):hover .arrow-right {
+        transform: rotate(0deg) scale(1.2);
+      }
+  
+      .slider-wrapper {
+        height: 40px;
+        padding: 0 10px;
+        margin: 0;
+      }
+  
+      .category {
+        font-size: 12px;
+        line-height: 1.2;
+        font-weight: 400; /* Standard */
+      }
+  
+      #artwork-slider {
+        height: 3px;
+      }
+  
+      .bio-container,
+      .contact-container {
+        width: 90%;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px 0;
+      }
+  
+      .bio-section {
+        flex-direction: column;
+        gap: 40px;
+        margin-bottom: 40px;
+      }
+  
+      .bio-text-column {
+        gap: 40px;
+      }
+  
+      .bio-text,
+      .contact-text {
+        max-width: 100%;
+        font-size: 12px;
+        line-height: 1.4;
+        font-weight: 400; /* Standard */
+      }
+  
+      .bio-image-container {
+        width: 180px;
+        height: 240px;
+      }
+  
+      .bio-line {
+        width: 100%;
+        margin: 40px 0;
+      }
+  
+      .diploma-section {
+        flex-direction: column;
+        gap: 40px;
+      }
+  
+      .diploma-image-container {
+        width: 180px;
+        height: 240px;
+      }
+  
+      .diploma-text {
+        max-width: 100%;
+        font-weight: 400; /* Standard */
+      }
+  
+      .interview-section,
+      .award-section {
+        margin-left: 0;
+        max-width: 100%;
+        margin-bottom: 40px;
+        font-weight: 400; /* Standard */
+      }
+  
+      .social-links {
+        margin-left: 0;
+        margin-top: 40px;
+      }
+  
+      .social-icon {
+        width: 24px;
+        height: 24px;
+      }
+  
+      .legal-button {
+        font-size: 11px;
+        font-weight: 400; /* Standard */
+      }
+  
+      .legal-text {
+        max-width: 100%;
+        font-size: 10px;
+        line-height: 1.4;
+        font-weight: 400; /* Standard */
+        position: absolute;
+        top: 100%;
+        left: 0;
+      }
+  
+      .legal-text h1 {
+        font-size: 14px;
+        font-weight: 700;
+      }
+  
+      .legal-text h2 {
+        font-size: 12px;
+        font-weight: 500;
+      }
+  
+      .visuals-container {
+        width: 90%;
+        max-width: 1000px;
+        padding: 20px 0;
+      }
+  
+      .visuals-grid {
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+  
+      .visuals-image {
+        max-width: 100%;
+      }
+  
+      .visuals-video {
+        max-width: 100%;
+      }
+    }
+    .contact-container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px 0;
+  }
+
+  .contact-text {
+    max-width: 100%;
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: 400;
+  }
+
+  .legal-button {
+    font-size: 11px;
+    font-weight: 400;
+  }
+
+  .legal-text {
+    max-width: 100%;
+    font-size: 10px;
+    line-height: 1.4;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .legal-text.visible {
+    top: 100% !important;
+  }
+
+  .legal-text h1 {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .legal-text h2 {
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  </style>
+</head>
+<body>
+  <!-- Hover Areas for Arrows -->
+  <div class="hover-area hover-left" id="hover-left"></div>
+  <div class="hover-area hover-right" id="hover-right"></div>
+
+  <!-- Header Section -->
+  <header class="w-full h-[133px] bg-[#343333] overflow-visible relative">
+    <div class="header-content max-w-[1000px] mx-auto relative">
+      <div class="header-top flex">
+        <div class="logo">
+          <a href="index.html">
+            <img src="https://sitoform.com/logo/sito+RDA_logo01" alt="Logo" class="w-[210px] h-[75px]" />
+          </a>
+        </div>
+        <div class="header-text-nav">
+          <div class="header-text leading-tight">
+            <p class="owner">SITO SCHWARZENBERGER</p>
+            <p class="ownersub1">RADIKAL DESIGN</p>
+            <p class="ownersub2">ALLIANCE</p>
+          </div>
+          <nav class="nav-links flex space-x-2">
+            <a href="?page=biography" class="headerlinks hover:underline" id="biography-link">BIOGRAPHY</a>
+            <a href="?page=contact" class="headerlinks hover:underline" id="contact-link">CONTACT</a>
+            <a href="?page=visuals" class="headerlinks hover:underline" id="visuals-link">VISUALS</a>
+          </nav>
+        </div>
+        <a href="https://sitoschwarzenberger.art" class="art-link artlink hover:underline">> ART</a>
+      </div>
+      <div class="blue-line"></div>
+    </div>
+  </header>
+
+  <!-- Main Content (Home Page) -->
+  <div id="main-content">
+    <!-- Metadata Section -->
+    <section class="w-full py-4 bg-[#343333]">
+      <div class="metadata-container">
+        <!-- Metadata Row -->
+        <div class="metadata-section flex items-start">
+          <div class="metadata-row">
+            <!-- Total and Current Artwork Numbers -->
+            <div class="metadata-item text-left">
+              <div class="number-align">
+                <p id="total-artworks" class="projectdata">0</p>
+                <p id="artwork-number" class="projectdata"></p>
+              </div>
+            </div>
+            <!-- Project -->
+            <div class="metadata-item project-item">
+              <div class="metadata-group">
+                <div class="short-vertical-line"></div>
+                <div class="text-wrapper">
+                  <p class="category">PROJECT</p>
+                  <p id="artwork-title" class="projectdata"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Year and Type Row -->
+          <div class="year-type-row">
+            <!-- Year -->
+            <div class="metadata-item year-item">
+              <div class="metadata-group">
+                <div class="short-vertical-line"></div>
+                <div class="text-wrapper">
+                  <p class="category">YEAR</p>
+                  <p id="artwork-year" class="projectdata"></p>
+                </div>
+              </div>
+            </div>
+            <!-- Type -->
+            <div class="metadata-item type-item">
+              <div class="metadata-group">
+                <div class="short-vertical-line"></div>
+                <div class="text-wrapper">
+                  <p class="category">TYPE</p>
+                  <p id="artwork-type" class="projectdata"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Description -->
+        <div class="description-wrapper">
+          <div id="description"></div>
+        </div>
+        <!-- Arrows and Slider -->
+        <div class="arrow-container">
+          <div class="arrow-wrapper" id="arrow-left-wrapper">
+            <img src="/images/nextArrow_01.svg" alt="Previous Arrow" class="arrow arrow-left" id="arrow-left">
+          </div>
+          <div class="slider-wrapper">
+            <input type="range" id="artwork-slider" min="1" value="1" step="1">
+          </div>
+          <div class="arrow-wrapper" id="arrow-right-wrapper">
+            <img src="/images/nextArrow_01.svg" alt="Next Arrow" class="arrow arrow-right" id="arrow-right">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="artwork-section">
+      <div class="max-w-[1000px] mx-auto text-center">
+        <div id="artwork-display" class="artwork-display">
+          <div id="loading-spinner" class="absolute hidden">
+            <svg class="animate-spin h-8 w-8 text-blue-500" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="15 45" />
+            </svg>
+          </div>
+          <div id="loading-progress" class="absolute hidden text-white text-lg font-semibold">
+            <span id="progress-percentage">0%</span>
+          </div>
+          <img src="" alt="Artwork" id="artwork-image" />
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Biography Content -->
+  <div id="biography-content" class="hidden">
+    <section class="w-full py-8 bg-[#343333]">
+      <div class="bio-container">
+        <!-- Bio Section -->
+        <div class="bio-section">
+          <div class="bio-image-container">
+            <div class="bio-image-bg"></div>
+            <img src="https://sitoform.com/images/portrait/sitoIMG_1661_B4.jpg?width=800&quality=75" alt="Sito Schwarzenberger" class="bio-image">
+          </div>
+          <div class="bio-text-column">
+            <div class="bio-text">
+              <p>
+                I was born on the 26th of July in 1976 in Graz. Shortly afterwards my parents moved from Vienna to a farm at 
+                the “Mostviertel” where we experienced a kind of self-sufficient life between contemporary art and nature. 
+                Being artistic and being driven to apply design to function never left my mind since then. 
+                In 2010 my son named Juni was born. Let's make more good design!
+              </p>
+            </div>
+            <div class="social-links">
+              <a href="https://www.instagram.com/sitoform/" target="_blank">
+                <img src="https://sitoform.com/images/portrait/insta_icon01.svg" alt="Instagram" class="social-icon">
+              </a>
+              <a href="https://x.com/sitoart" target="_blank">
+                <img src="https://sitoform.com/images/portrait/x_icon01.svg" alt="X" class="social-icon">
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bio-line"></div>
+        <!-- Diploma Section -->
+        <div class="diploma-section">
+          <div class="diploma-image-container">
+            <img src="https://sitoform.com/images/portrait/sito_diploma_work_cover01.jpg?width=800&quality=75" alt="Diploma Work Cover" class="diploma-image">
+          </div>
+          <div class="diploma-text">
+            <h2 class="text-xl font-bold">Diploma Thesis</h2>
+            <p class="text-lg font-light">Media Theory</p>
+            <p class="text-lg font-light">
+              PDF: <a href="https://sitoform.com/pdf/Schwarzenberger_Wie_Bild-Symbole_die_Oeffentlichkeit_beeinflussen.pdf" target="_blank" class="underline hover:text-[#009FE3]">Download</a>
+            </p>
+          </div>
+        </div>
+        <div class="bio-line"></div>
+        <!-- Interview Section -->
+        <div class="interview-section">
+          <h2 class="text-xl font-bold">Interview</h2>
+          <p class="text-lg font-light">
+            <a href="https://sitoform.com/pdf/computerarts_vj_sitosun.pdf" target="_blank" class="underline hover:text-[#009FE3]">Chinese Computer Arts magazine, 2009</a>
+          </p>
+        </div>
+        <div class="bio-line"></div>
+        <!-- Award Section -->
+        <div class="award-section">
+          <h2 class="text-xl font-bold">Appreciation Award for Graphic Design</h2>
+          <p class="text-lg font-light">from the Lower-Austria Cultural Department, Cultural Awards 2009</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+ 
+ <!-- Visuals Content -->
+<!-- Visuals Content -->
+<div id="visuals-content" class="hidden">
+  <section class="w-full py-8 bg-[#343333]">
+    <div class="visuals-container max-w-[1000px] mx-auto px-4">
+      <div class="visuals-grid">
+        <!-- Image 1 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_1882(c_grafzyx)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 1 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/z_R4ysouTvc" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 2 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_1834(c_grafzyx)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 2 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/O3pzhlu2MTo" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 3 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_1839(c_grafzyx)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 3 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/vIPKLYRrwrI" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 4 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMGP0800(c_grafzyx)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 4 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/2WUQXjJWjmA" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 5 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_1840(c_grafzyx)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 5 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/WOu17DkKi30" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 6 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_1886(c_grafzyx)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 6 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/qA-8r37dLZE" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 7 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_1860(c_grafzyx)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 7 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/-A7wg5Ew6-s" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 8 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_1843(c_grafzyx)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 8 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/ZwZ8dqwLVTk" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 9 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/YLlepHQSPTA" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 9 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_1846(c_grafzyx)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 10 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/zbyI1OIWZh0" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 11 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/_Uv9vxt_gZA" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 10 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_1887(c_grafzyx)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 12 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/jlT8GfSwfbc" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 11 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_1859(c_grafzyx)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 13 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/EFTei0FfUvk" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 12 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_1862(c_grafzyx)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- Vimeo Video 1 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://player.vimeo.com/video/40260343" data-loaded="false" title="Vimeo video" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 13 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_1875(c_grafzyx)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 14 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/xg7CDX1qIFs" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 14 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_1888(c_grafzyx)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 15 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/795Jzu5aPzQ" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 15 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_1894(c_grafzyx)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- Vimeo Video 2 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://player.vimeo.com/video/40263238" data-loaded="false" title="Vimeo video" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 16 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/77jhkWVU88o" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 16 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_4761(c_pKrk)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 17 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/Ze8aZWdfa5E" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 17 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_4812(c_pKrk)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 18 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/7VPnIVGkV6U" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 18 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_4832(c_pKrk)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 19 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/L_yDuBpyPfw" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 19 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_4833(c_pKrk)_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 20 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/vIobZFFjbM8" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 20 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_8636_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 21 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/gcWOwPYRuAI" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 21 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_8639_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 22 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/DQIBa2BkmCA" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 22 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_8641_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 23 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/VBlAMpebuPU" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 23 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_8644_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 24 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/r08dJa87ROE" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 24 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/IMG_8645_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="853" alt="Visual Artwork">
+        <!-- YouTube Video 25 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/keh1elCFiGw" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 26 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/QBPkf-tS_B4" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 25 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/ragnarhof_endorphine01_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="721" alt="Visual Artwork">
+        <!-- YouTube Video 27 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/c1ibcCaG2p0" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- Image 26 -->
+        <img class="visuals-image lazy responsive" loading="lazy" data-src="https://sitoform.com/img/visuals/wolve-wabe-sonnenpark01_1280.jpg" src="https://sitoform.com/img/visuals/placeholder.jpg" width="1280" height="816" alt="Visual Artwork">
+        <!-- YouTube Video 28 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/w6L_6PM9oGk" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 29 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/QkLbSCNz4pk" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 30 -->
+        <div class="visuals-video lazy-video">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/jNEVqgIcCHs" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 31 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/9Z8w4-fgdyM" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 32 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/MopYUmJ9EME" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 33 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/LGENRCbz42M" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 34 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/GN1ruIb68zk" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 35 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/4mXrknL6684" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 36 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/3ym-o6jX4gw" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 37 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/cgCB65rI52k" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 38 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/My820YhUreE" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 39 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/rED9WFb4Cq8" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 40 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/V1zLtnctpRU" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 41 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/9uJsNR8aE1c" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 42 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/omrO0NAowJE" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 43 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/ctOmCT5ZUqI" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 44 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/mOqJFh00-r4" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 45 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/LZr_adxwevw" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 46 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/ilD9B3za-pg" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 47 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/C5w5_4XZN0w" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <!-- YouTube Video 48 (4x3) -->
+        <div class="visuals-video lazy-video visuals-video-4x3">
+          <iframe width="100%" height="315" data-src="https://www.youtube.com/embed/biL6oSNGf-w" data-loaded="false" title="YouTube video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+  <!-- Contact Content -->
+  <div id="contact-content" class="hidden">
+    <section class="w-full py-8 bg-[#343333]">
+      <div class="contact-container">
+        <div class="contact-text">
+          <p>
+            Offenlegung gemäß § 25 Mediengesetz für kleine Webseiten<br>
+            Medieninhaber und für den Inhalt verantwortlich<br>
+            Sito Schwarzenberger<br>
+            AUSTRIA<br>
+            1050 WIEN<br>
+            Genaue Adresse auf Anfrage<br>
+            E-Mail: <a href="mailto:sitoform@gmail.com">sitoform@gmail.com</a>
+          </p>
+          <div class="legal-button" id="legal-button">Datenschutzerklärung</div>
+          <div class="legal-text" id="legal-text">
+            <h1>Datenschutzerklärung</h1>
+            <h2>1. Allgemeine Hinweise</h2>
+            <p>
+              Diese Datenschutzerklärung informiert Sie darüber, wie wir mit Ihren personenbezogenen Daten umgehen, wenn Sie unsere Website unter <a href="https://sitoform.com">https://sitoform.com</a> besuchen. Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert werden können.
+            </p>
+            <h2>2. Verantwortliche Stelle</h2>
+            <p>
+              Verantwortlich für die Datenverarbeitung ist:<br>
+              <strong>Sito Schwarzenberger</strong><br>
+              1050 Wien, Österreich<br>
+              (Genaue Adresse auf Anfrage)<br>
+              E-Mail: <a href="mailto:sitoform@gmail.com">sitoform@gmail.com</a>
+            </p>
+            <h2>3. Datenerfassung auf unserer Website</h2>
+            <h3>Wie erfassen wir Ihre Daten?</h3>
+            <p>
+              Ihre Daten werden erhoben, wenn Sie uns diese freiwillig mitteilen, z. B. durch Kontaktanfragen per E-Mail. Automatisch erfassen wir technische Daten (z. B. IP-Adresse, Browser, Uhrzeit des Zugriffs) in Server-Log-Dateien, um die Website bereitzustellen.
+            </p>
+            <h3>Wofür nutzen wir Ihre Daten?</h3>
+            <ul>
+              <li><strong>Server-Logs</strong>: Zur Sicherstellung der technischen Funktionalität und Sicherheit der Website (Art. 6 Abs. 1 lit. f DSGVO).</li>
+              <li><strong>Kontaktanfragen</strong>: Zur Bearbeitung Ihrer Anfragen (Art. 6 Abs. 1 lit. b DSGVO oder Art. 6 Abs. 1 lit. f DSGVO).</li>
+            </ul>
+            <h3>Speicherdauer</h3>
+            <p>
+              Daten aus Kontaktanfragen speichern wir, bis der Zweck erfüllt ist oder Sie die Löschung verlangen, sofern keine gesetzlichen Aufbewahrungspflichten bestehen. Server-Logs werden nach maximal 30 Tagen gelöscht.
+            </p>
+            <h2>4. Hosting</h2>
+            <p>
+              Unsere Website wird bei Render (Render, Inc., USA) gehostet. Personenbezogene Daten (z. B. IP-Adressen, Zugriffsdaten) werden auf den Servern von Render gespeichert. Dies erfolgt im Interesse einer sicheren und effizienten Website-Bereitstellung (Art. 6 Abs. 1 lit. f DSGVO). Render verarbeitet Daten nur nach unseren Weisungen.
+            </p>
+            <p>
+              Datenverarbeitung außerhalb der EU: Render ist in den USA ansässig. Wir haben mit Render Vereinbarungen zur Einhaltung der DSGVO abgeschlossen (Standardvertragsklauseln).
+            </p>
+            <h2>5. Ihre Rechte</h2>
+            <p>
+              Sie haben folgende Rechte bezüglich Ihrer personenbezogenen Daten:
+            </p>
+            <ul>
+              <li>Auskunft über gespeicherte Daten (Art. 15 DSGVO).</li>
+              <li>Berichtigung unrichtiger Daten (Art. 16 DSGVO).</li>
+              <li>Löschung, sofern keine gesetzlichen Gründe entgegenstehen (Art. 17 DSGVO).</li>
+              <li>Einschränkung der Verarbeitung (Art. 18 DSGVO).</li>
+              <li>Datenübertragbarkeit (Art. 20 DSGVO).</li>
+              <li>Widerspruch gegen die Verarbeitung (Art. 21 DSGVO).</li>
+            </ul>
+            <p>
+              Kontaktieren Sie uns unter <a href="mailto:sitoform@gmail.com">sitoform@gmail.com</a>. Sie können sich auch bei einer Aufsichtsbehörde beschweren, z. B. der österreichischen Datenschutzbehörde (<a href="https://www.dsb.gv.at">dsb.gv.at</a>).
+            </p>
+            <h2>6. SSL/TLS-Verschlüsselung</h2>
+            <p>
+              Unsere Website verwendet SSL/TLS-Verschlüsselung (https://) zum Schutz Ihrer Daten während der Übertragung.
+            </p>
+            <h2>7. Third-Party Services</h2>
+            <h3>YouTube Video Embeds</h3>
+            <p>
+              Our website includes embedded YouTube videos to showcase visual content. These videos are embedded in a manner that respects user privacy. When you view a page with an embedded YouTube video, a connection is established with YouTube's servers (operated by Google LLC, USA). This may result in the processing of data such as your IP address or device information by YouTube. We embed videos in a way that minimizes data collection, but YouTube may still collect data as outlined in their <a href="https://policies.google.com/privacy">Privacy Policy</a>. The legal basis for this is our legitimate interest in providing engaging visual content (Art. 6 Abs. 1 lit. f DSGVO). You can avoid data processing by not viewing pages with embedded videos.
+            </p>
+            <h3>No Cookies or Other Analysis Tools</h3>
+            <p>
+              Apart from the YouTube embeds described above, our website does not use cookies or other analysis tools, unless explicitly stated otherwise.
+            </p>
+            <h2>8. Änderungen der Datenschutzerklärung</h2>
+            <p>
+              Wir behalten uns vor, diese Datenschutzerklärung anzupassen, um sie an geänderte rechtliche Anforderungen anzupassen. Die aktuelle Version finden Sie stets auf unserer Website.
+            </p>
+            <p>
+              Stand: Mai 2025
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+  <!-- JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  let artworks = [];
+  let currentIndex = 0;
+  const typingTimeouts = new Map();
+  const imageCache = new Map();
+  let progressTimeout = null;
+
+  // DOM elements
+  const totalArtworks = document.getElementById('total-artworks');
+  const artworkNumber = document.getElementById('artwork-number');
+  const artworkTitle = document.getElementById('artwork-title');
+  const artworkYear = document.getElementById('artwork-year');
+  const artworkType = document.getElementById('artwork-type');
+  const description = document.getElementById('description');
+  const artworkDisplay = document.getElementById('artwork-display');
+  const artworkImage = document.getElementById('artwork-image');
+  const loadingSpinner = document.getElementById('loading-spinner');
+  const loadingProgress = document.getElementById('loading-progress');
+  const progressPercentage = document.getElementById('progress-percentage');
+  const arrowLeft = document.getElementById('arrow-left');
+  const arrowRight = document.getElementById('arrow-right');
+  const arrowLeftWrapper = document.getElementById('arrow-left-wrapper');
+  const arrowRightWrapper = document.getElementById('arrow-right-wrapper');
+  const hoverLeft = document.getElementById('hover-left');
+  const hoverRight = document.getElementById('hover-right');
+  const artworkSection = document.querySelector('.artwork-section');
+  const metadataSection = document.querySelector('.w-full.py-4');
+  const artworkSlider = document.getElementById('artwork-slider');
+  const arrowContainer = document.querySelector('.arrow-container');
+  const blueLine = document.querySelector('.blue-line');
+  const mainContent = document.getElementById('main-content');
+  const biographyContent = document.getElementById('biography-content');
+  const visualsContent = document.getElementById('visuals-content');
+  const contactContent = document.getElementById('contact-content');
+  const biographyLink = document.getElementById('biography-link');
+  const contactLink = document.getElementById('contact-link');
+  const visualsLink = document.getElementById('visuals-link');
+  const legalButton = document.getElementById('legal-button');
+  const legalText = document.getElementById('legal-text');
+
+  // Toggle legal text visibility with enhanced debugging
+  legalButton.addEventListener('click', () => {
+    const isHidden = !legalText.classList.contains('visible');
+    legalText.classList.toggle('visible', isHidden);
+    legalText.style.top = ''; // Clear inline top
+    const contactText = document.querySelector('.contact-text');
+    const contactRect = contactText.getBoundingClientRect();
+    const containerRect = document.querySelector('.contact-container').getBoundingClientRect();
+    console.log('Legal text toggled:', isHidden ? 'visible' : 'hidden');
+    console.log('Computed top after toggle:', getComputedStyle(legalText).top);
+    console.log('Inline top:', legalText.style.top || 'none');
+    console.log('Contact text position:', {
+      top: contactRect.top,
+      bottom: contactRect.bottom,
+      height: contactRect.height
+    });
+    console.log('Container position:', {
+      top: containerRect.top,
+      bottom: containerRect.bottom,
+      height: containerRect.height
+    });
+  });
+
+  // Toggle content based on URL param
+  function toggleContent() {
+    const params = new URLSearchParams(window.location.search);
+    const page = params.get('page') || '';
+    mainContent.classList.add('hidden');
+    biographyContent.classList.add('hidden');
+    visualsContent.classList.add('hidden');
+    contactContent.classList.add('hidden');
+    biographyLink.classList.remove('active');
+    contactLink.classList.remove('active');
+    visualsLink.classList.remove('active');
+    hoverLeft.classList.remove('hidden');
+    hoverRight.classList.remove('hidden');
+
+    if (page === 'biography') {
+      biographyContent.classList.remove('hidden');
+      biographyLink.classList.add('active');
+      hoverLeft.classList.add('hidden');
+      hoverRight.classList.add('hidden');
+      preloadBioImages();
+      console.log('Biography page loaded');
+    } else if (page === 'visuals') {
+      visualsContent.classList.remove('hidden');
+      visualsLink.classList.add('active');
+      hoverLeft.classList.add('hidden');
+      hoverRight.classList.add('hidden');
+      preloadVisualsContent();
+      console.log('Visuals page loaded');
+    } else if (page === 'contact') {
+      contactContent.classList.remove('hidden');
+      contactLink.classList.add('active');
+      hoverLeft.classList.add('hidden');
+      hoverRight.classList.add('hidden');
+      console.log('Contact page loaded');
+    } else {
+      mainContent.classList.remove('hidden');
+      fetchArtworks();
+      console.log('Home page loaded');
+    }
+  }
+
+  // Navigation link handlers
+  biographyLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    history.pushState(null, '', '?page=biography');
+    toggleContent();
+  });
+  contactLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    history.pushState(null, '', '?page=contact');
+    toggleContent();
+  });
+  visualsLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    history.pushState(null, '', '?page=visuals');
+    toggleContent();
+  });
+
+  // Handle popstate for back/forward navigation
+  window.addEventListener('popstate', toggleContent);
+
+  // Preload biography images
+  function preloadBioImages() {
+    const bioImages = [
+      'https://sitoform.com/images/portrait/sitoIMG_1661_B4.jpg?width=800&quality=75',
+      'https://sitoform.com/images/portrait/sito_diploma_work_cover01.jpg?width=800&quality=75',
+      'https://sitoform.com/images/portrait/insta_icon01.svg',
+      'https://sitoform.com/images/portrait/x_icon01.svg'
+    ];
+    bioImages.forEach(url => {
+      if (!imageCache.has(url)) {
+        const img = new Image();
+        img.src = url;
+        img.onload = () => {
+          imageCache.set(url, url);
+          console.log('Preloaded bio image:', url);
+        };
+        img.onerror = () => console.error('Error preloading bio image:', url);
+      }
+    });
+  }
+
+  // Preload visuals images and lazy-load videos
+  function preloadVisualsContent() {
+    if (new URLSearchParams(window.location.search).get('page') !== 'visuals') {
+      console.log('Skipping preloadVisualsContent: Not on visuals page');
+      return;
+    }
+    console.log('preloadVisualsContent started');
+    const visualsImages = [
+      'https://sitoform.com/img/visuals/IMG_1882(c_grafzyx)_1280.jpg',
+      'https://sitoform.com/img/visuals/IMG_1834(c_grafzyx)_1280.jpg'
+    ];
+    visualsImages.forEach(url => {
+      const optimizedUrl = `${url}?width=800&quality=75`;
+      if (!imageCache.has(optimizedUrl)) {
+        const img = new Image();
+        img.src = optimizedUrl;
+        img.onload = () => {
+          imageCache.set(optimizedUrl, optimizedUrl);
+          console.log('Preloaded visuals image:', optimizedUrl);
+        };
+        img.onerror = () => console.error('Error preloading visuals image:', optimizedUrl);
+      }
+    });
+    setTimeout(() => {
+      const lazyImages = document.querySelectorAll('.visuals-image.lazy');
+      console.log('Found lazy images:', lazyImages.length);
+      if (lazyImages.length === 0) {
+        console.warn('No lazy images found. Retrying in 500ms...');
+        setTimeout(() => {
+          const retryImages = document.querySelectorAll('.visuals-image.lazy');
+          console.log('Retry found lazy images:', retryImages.length);
+          retryImages.forEach(img => imageObserver.observe(img));
+        }, 500);
+      }
+      const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            const src = img.getAttribute('data-src');
+            if (src) {
+              img.src = `${src}?width=800&quality=75`;
+              img.classList.remove('lazy');
+              console.log('Lazy loaded image:', src);
+            } else {
+              console.warn('No data-src for image:', img);
+            }
+            observer.unobserve(img);
+          }
+        });
+      }, { rootMargin: '0px 0px 500px 0px' });
+      lazyImages.forEach(img => imageObserver.observe(img));
+      const lazyVideos = document.querySelectorAll('.lazy-video iframe');
+      console.log('Found lazy videos:', lazyVideos.length);
+      if (lazyVideos.length === 0) {
+        console.warn('No lazy videos found. Retrying in 500ms...');
+        setTimeout(() => {
+          const retryVideos = document.querySelectorAll('.lazy-video iframe');
+          console.log('Retry found lazy videos:', retryVideos.length);
+          retryVideos.forEach(iframe => videoObserver.observe(iframe));
+        }, 500);
+      }
+      const videoObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const iframe = entry.target;
+            const src = iframe.getAttribute('data-src');
+            if (src) {
+              iframe.src = src.replace('www.youtube.com', 'www.youtube-nocookie.com');
+              iframe.setAttribute('data-loaded', 'true');
+              iframe.removeAttribute('data-src');
+              console.log('Lazy loaded video iframe:', src);
+            } else {
+              console.warn('No data-src for video iframe:', iframe);
+            }
+            observer.unobserve(iframe);
+          }
+        });
+      }, { rootMargin: '0px 0px 500px 0px' });
+      lazyVideos.forEach(iframe => videoObserver.observe(iframe));
+    }, 100);
+    console.log('preloadVisualsContent completed');
+  }
+
+  // Observe description content changes (Home page only)
+  const descriptionObserver = new MutationObserver(() => {
+    if (new URLSearchParams(window.location.search).get('page') !== '') {
+      console.log('Skipping descriptionObserver: Not on home page');
+      return;
+    }
+    console.log('Description observer triggered');
+    adjustLayoutBasedOnDescription();
+  });
+  if (description) {
+    descriptionObserver.observe(description, { childList: true, characterData: true, subtree: true });
+  }
+
+  // Supabase client
+  const supabaseUrl = 'https://ydfkrwjafnuvdvezpkcp.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkZmtyd2phZm51dmR2ZXpwa2NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxNzA0MTUsImV4cCI6MjA2MDc0NjQxNX0.kHzI8KRGFBRrLpFVvJfK2JP_P2a9nRJzDBm5h235eJw';
+  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+  // Debounce function
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  // Navigation functions
+  const debouncedSwipeLeft = debounce(() => {
+    if (currentIndex <= 0) return;
+    currentIndex--;
+    showSpinner();
+    loadImageWithProgress(artworks[currentIndex].imageurl || 'https://via.placeholder.com/300?text=No+Image', updateArtwork);
+  }, 100);
+
+  const debouncedSwipeRight = debounce(() => {
+    if (currentIndex >= artworks.length - 1) return;
+    currentIndex++;
+    showSpinner();
+    loadImageWithProgress(artworks[currentIndex].imageurl || 'https://via.placeholder.com/300?text=No+Image', updateArtwork);
+  }, 100);
+
+  // Slider input handler
+  let debounceTimeout;
+  artworkSlider.addEventListener('input', (e) => {
+    clearTimeout(debounceTimeout);
+    debounceTimeout = setTimeout(() => {
+      const newIndex = parseInt(e.target.value) - 1;
+      if (newIndex !== currentIndex) {
+        currentIndex = newIndex;
+        showSpinner();
+        loadImageWithProgress(artworks[currentIndex].imageurl || 'https://via.placeholder.com/300?text=No+Image', updateArtwork);
+      }
+    }, 100);
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.keyCode === 37) debouncedSwipeLeft();
+    else if (e.keyCode === 39) debouncedSwipeRight();
+  });
+
+  // Load image with progress
+  function loadImageWithProgress(url, callback) {
+    const optimizedUrl = `${url}?width=800&quality=75`;
+    console.log('Loading image:', optimizedUrl);
+    if (imageCache.has(optimizedUrl)) {
+      console.log('Using cached image:', optimizedUrl);
+      artworkImage.src = imageCache.get(optimizedUrl);
+      hideSpinner();
+      hideProgress();
+      callback();
+      return;
+    }
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', optimizedUrl, true);
+    xhr.responseType = 'blob';
+    xhr.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percentComplete = Math.round((event.loaded / event.total) * 100);
+        progressPercentage.textContent = `${percentComplete}%`;
+        showProgress();
+        console.log(`Image loading progress: ${percentComplete}%`);
+      }
+    };
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        const blob = xhr.response;
+        const objectUrl = URL.createObjectURL(blob);
+        imageCache.set(optimizedUrl, objectUrl);
+        artworkImage.src = objectUrl;
+        hideSpinner();
+        hideProgress();
+        callback();
+      } else {
+        console.error('Error loading image:', xhr.status);
+        artworkImage.src = 'https://via.placeholder.com/300?text=Error';
+        hideSpinner();
+        hideProgress();
+        callback();
+      }
+    };
+    xhr.onerror = () => {
+      console.error('Error loading image:', optimizedUrl);
+      artworkImage.src = 'https://via.placeholder.com/300?text=Error';
+      hideSpinner();
+      hideProgress();
+      callback();
+    };
+    showSpinner();
+    xhr.send();
+  }
+
+  // Preload adjacent images
+  function preloadImages() {
+    const indicesToPreload = [
+      currentIndex - 1 >= 0 ? currentIndex - 1 : null,
+      currentIndex + 1 < artworks.length ? currentIndex + 1 : null
+    ].filter(i => i !== null);
+    indicesToPreload.forEach(index => {
+      const url = artworks[index].imageurl || 'https://via.placeholder.com/300?text=No+Image';
+      const optimizedUrl = `${url}?width=800&quality=75`;
+      if (!imageCache.has(optimizedUrl)) {
+        const img = new Image();
+        img.src = optimizedUrl;
+        img.onload = () => {
+          imageCache.set(optimizedUrl, optimizedUrl);
+          console.log('Preloaded image:', optimizedUrl);
+        };
+        img.onerror = () => console.error('Error preloading image:', optimizedUrl);
+      }
+    });
+  }
+
+  function showSpinner() {
+    console.log('showSpinner called');
+    if (!loadingSpinner || !artworkDisplay) return;
+    artworkDisplay.classList.add('loading-active');
+    artworkDisplay.classList.remove('progress-visible');
+    if (!artworkDisplay.contains(loadingSpinner)) {
+      artworkDisplay.appendChild(loadingSpinner);
+    }
+    if (!artworkDisplay.contains(loadingProgress)) {
+      artworkDisplay.appendChild(loadingProgress);
+    }
+    if (!artworkDisplay.contains(artworkImage)) {
+      artworkDisplay.appendChild(artworkImage);
+    }
+    const spinnerSvg = loadingSpinner.querySelector('svg');
+    if (spinnerSvg) {
+      spinnerSvg.style.animation = 'spin 1s linear infinite';
+    }
+  }
+
+  function hideSpinner() {
+    console.log('hideSpinner called');
+    if (artworkDisplay) {
+      artworkDisplay.classList.remove('loading-active');
+      artworkDisplay.classList.remove('progress-visible');
+    }
+  }
+
+  function showProgress() {
+    clearTimeout(progressTimeout);
+    progressTimeout = setTimeout(() => {
+      if (artworkDisplay.classList.contains('loading-active')) {
+        artworkDisplay.classList.add('progress-visible');
+        console.log('Showing progress');
+      }
+    }, 300);
+  }
+
+  function hideProgress() {
+    clearTimeout(progressTimeout);
+    artworkDisplay.classList.remove('progress-visible');
+    progressPercentage.textContent = '0%';
+  }
+
+  function adjustArtworkHeightAndScale() {
+    if (new URLSearchParams(window.location.search).get('page') !== '') {
+      console.log('Skipping adjustArtworkHeightAndScale: Not on home page');
+      return;
+    }
+    const headerHeight = document.querySelector('header').offsetHeight;
+    const metadataHeight = metadataSection.offsetHeight;
+    const viewportHeight = window.innerHeight;
+    const paddingTotal = parseInt(getComputedStyle(artworkDisplay).paddingTop) + parseInt(getComputedStyle(artworkDisplay).paddingBottom);
+    const availableHeight = viewportHeight - headerHeight - metadataHeight - 20;
+    const minHeight = window.innerWidth <= 768 ? 150 : 200;
+    const sectionHeight = Math.max(minHeight, availableHeight);
+    artworkSection.style.height = `${sectionHeight}px`;
+    if (artworkImage.naturalWidth && artworkImage.naturalHeight) {
+      const containerWidth = artworkSection.offsetWidth - (parseInt(getComputedStyle(artworkDisplay).paddingLeft) + parseInt(getComputedStyle(artworkDisplay).paddingRight));
+      const containerHeight = sectionHeight - paddingTotal;
+      const widthScale = containerWidth / artworkImage.naturalWidth;
+      let scaledHeight = artworkImage.naturalHeight * widthScale;
+      if (scaledHeight > containerHeight) {
+        const heightScale = containerHeight / scaledHeight;
+        scaledHeight = containerHeight;
+        const scaledWidth = artworkImage.naturalWidth * widthScale * heightScale;
+        artworkImage.style.maxWidth = `${scaledWidth}px`;
+        artworkImage.style.maxHeight = `${scaledHeight}px`;
+      } else {
+        artworkImage.style.maxWidth = `${containerWidth}px`;
+        artworkImage.style.maxHeight = 'none';
+      }
+    }
+    adjustLayoutBasedOnDescription();
+  }
+
+  function adjustLayoutBasedOnDescription() {
+    if (new URLSearchParams(window.location.search).get('page') !== '') {
+      console.log('Skipping adjustLayoutBasedOnDescription: Not on home page');
+      return;
+    }
+    const description = document.getElementById('description');
+    const artworkSection = document.querySelector('.artwork-section');
+    const arrowContainer = document.querySelector('.arrow-container');
+    if (!description || !artworkSection || !arrowContainer) return;
+    const computedStyle = getComputedStyle(description);
+    const fontSize = parseFloat(computedStyle.fontSize) || 12;
+    const lineHeight = parseFloat(computedStyle.lineHeight) || fontSize * (window.innerWidth <= 768 ? 1.4 : 1.6);
+    const descriptionHeight = description.offsetHeight || 0;
+    const lineCount = Math.min(Math.round(descriptionHeight / lineHeight) || 1, 6);
+    const isMobile = window.innerWidth <= 768;
+    const isTablet = window.innerWidth > 768 && window.innerWidth <= 999;
+    const isDesktop = window.innerWidth > 999;
+    if (isDesktop) {
+      let artworkSectionMarginTop = 0;
+      let arrowContainerBottom = 12;
+      let marginAdjustment = 0;
+      let arrowAdjustment = 0;
+      if (lineCount <= 1) {
+        marginAdjustment = -20;
+        arrowAdjustment = 38;
+      } else if (lineCount === 2) {
+        marginAdjustment = -15;
+        arrowAdjustment = 8;
+      } else if (lineCount === 3) {
+        marginAdjustment = -10;
+        arrowAdjustment = -2;
+      } else if (lineCount === 4) {
+        marginAdjustment = -5;
+        arrowAdjustment = -7;
+      } else if (lineCount >= 5) {
+        marginAdjustment = 0;
+        arrowAdjustment = -12;
+      }
+      artworkSectionMarginTop += marginAdjustment;
+      arrowContainerBottom += arrowAdjustment;
+      artworkSection.style.marginTop = `${artworkSectionMarginTop}px`;
+      arrowContainer.style.bottom = `${arrowContainerBottom}px`;
+    } else if (isTablet) {
+      let artworkSectionMarginTop = -60;
+      let arrowContainerBottom = 12;
+      let marginAdjustment = 0;
+      let arrowAdjustment = 0;
+      if (lineCount <= 1) {
+        marginAdjustment = 10;
+        arrowAdjustment = 38;
+      } else if (lineCount === 2) {
+        marginAdjustment = 15;
+        arrowAdjustment = 8;
+      } else if (lineCount === 3) {
+        marginAdjustment = 20;
+        arrowAdjustment = -2;
+      } else if (lineCount === 4) {
+        marginAdjustment = 25;
+        arrowAdjustment = -7;
+      } else if (lineCount >= 5) {
+        marginAdjustment = 30;
+        arrowAdjustment = -12;
+      }
+      artworkSectionMarginTop += marginAdjustment;
+      arrowContainerBottom += arrowAdjustment;
+      artworkSection.style.marginTop = `${artworkSectionMarginTop}px`;
+      arrowContainer.style.bottom = `${arrowContainerBottom}px`;
+    } else if (isMobile) {
+      let artworkSectionMarginTop = 20;
+      let arrowContainerBottom = -42;
+      let marginAdjustment = 0;
+      let arrowAdjustment = 0;
+      if (lineCount <= 1) {
+        marginAdjustment = -65;
+        arrowAdjustment = -5;
+      } else if (lineCount === 2) {
+        marginAdjustment = -60;
+        arrowAdjustment = -3;
+      } else if (lineCount === 3) {
+        marginAdjustment = -50;
+        arrowAdjustment = 0;
+      } else if (lineCount === 4) {
+        marginAdjustment = -40;
+        arrowAdjustment = -5;
+      } else if (lineCount >= 5) {
+        marginAdjustment = -30;
+        arrowAdjustment = -10;
+      }
+      artworkSectionMarginTop += marginAdjustment;
+      arrowContainerBottom += arrowAdjustment;
+      artworkSection.style.marginTop = `${artworkSectionMarginTop}px`;
+      arrowContainer.style.bottom = `${arrowContainerBottom}px`;
+    }
+  }
+
+  window.addEventListener('resize', () => {
+    if (new URLSearchParams(window.location.search).get('page') !== '') {
+      console.log('Skipping resize handler: Not on home page');
+      return;
+    }
+    adjustArtworkHeightAndScale();
+  });
+
+  window.addEventListener('load', () => {
+    console.log('Load event triggered');
+    toggleContent();
+    if (new URLSearchParams(window.location.search).get('page') === '') {
+      adjustArtworkHeightAndScale();
+    }
+  });
+
+  artworkImage.addEventListener('load', () => {
+    if (new URLSearchParams(window.location.search).get('page') !== '') {
+      console.log('Skipping image load handler: Not on home page');
+      return;
+    }
+    adjustArtworkHeightAndScale();
+  });
+
+  function typeWriter(element, text, speed = 50, callback) {
+    if (typingTimeouts.has(element)) {
+      clearTimeout(typingTimeouts.get(element));
+      typingTimeouts.delete(element);
+    }
+    element.textContent = '';
+    let i = 0;
+    function type() {
+      if (i < text.length) {
+        element.textContent += text.charAt(i);
+        i++;
+        const timeout = setTimeout(type, speed);
+        typingTimeouts.set(element, timeout);
+      } else {
+        typingTimeouts.delete(element);
+        if (callback) callback();
+      }
+    }
+    type();
+  }
+
+  function stopTyping() {
+    typingTimeouts.forEach((timeout) => clearTimeout(timeout));
+    typingTimeouts.clear();
+    [artworkNumber, artworkTitle, artworkYear, artworkType].forEach(el => {
+      el.textContent = '';
+    });
+  }
+
+  function updateArtwork() {
+    stopTyping();
+    const currentArtwork = artworks[currentIndex];
+    totalArtworks.textContent = `${artworks.length}`;
+    typeWriter(artworkNumber, `${currentIndex + 1}`, 50, () => {
+      typeWriter(artworkTitle, currentArtwork.project || 'N/A', 50, () => {
+        typeWriter(artworkYear, currentArtwork.year || 'N/A', 50, () => {
+          typeWriter(artworkType, currentArtwork.type || 'N/A', 50);
+        });
+      });
+    });
+    description.textContent = currentArtwork.description || 'No description available';
+    artworkImage.alt = currentArtwork.project || 'Artwork';
+    artworkImage.style.animation = 'fadeIn 0.5s ease-in forwards';
+    if (currentIndex === 0) {
+      arrowLeft.classList.add('disabled');
+      arrowLeftWrapper.classList.add('disabled');
+      hoverLeft.style.cursor = 'default';
+    } else {
+      arrowLeft.classList.remove('disabled');
+      arrowLeftWrapper.classList.remove('disabled');
+      hoverLeft.style.cursor = 'pointer';
+    }
+    if (currentIndex === artworks.length - 1) {
+      arrowRight.classList.add('disabled');
+      arrowRightWrapper.classList.add('disabled');
+      hoverRight.style.cursor = 'default';
+    } else {
+      arrowRight.classList.remove('disabled');
+      arrowRightWrapper.classList.remove('disabled');
+      hoverRight.style.cursor = 'pointer';
+    }
+    artworkSlider.value = currentIndex + 1;
+    preloadImages();
+    adjustLayoutBasedOnDescription();
+    adjustArtworkHeightAndScale();
+    hideSpinner();
+  }
+
+  arrowLeftWrapper.addEventListener('click', debouncedSwipeLeft);
+  arrowRightWrapper.addEventListener('click', debouncedSwipeRight);
+  hoverLeft.addEventListener('click', debouncedSwipeLeft);
+  hoverRight.addEventListener('click', debouncedSwipeRight);
+
+  async function fetchArtworks() {
+    if (new URLSearchParams(window.location.search).get('page') !== '') {
+      console.log('Skipping fetchArtworks: Not on home page');
+      return;
+    }
+    console.log('fetchArtworks started');
+    showSpinner();
+    try {
+      const response = await fetch('https://sitoform25.onrender.com/api/artworks');
+      if (!response.ok) throw new Error('Failed to fetch artworks');
+      artworks = await response.json();
+      if (artworks.length === 0) {
+        artworkDisplay.innerHTML = '<p>No artworks found.</p>';
+        hideSpinner();
+        hideProgress();
+        return;
+      }
+      artworks = artworks.map((artwork, index) => ({
+        number: index + 1,
+        project: artwork.project,
+        year: artwork.year,
+        type: artwork.type,
+        description: artwork.description,
+        imageurl: artwork.imageurl
+      }));
+      totalArtworks.textContent = `${artworks.length}`;
+      artworkSlider.max = artworks.length;
+      artworkSlider.value = 1;
+      currentIndex = 0;
+      loadImageWithProgress(artworks[currentIndex].imageurl || 'https://via.placeholder.com/300?text=No+Image', () => {
+        updateArtwork();
+        preloadImages();
+      });
+    } catch (error) {
+      console.error('Error fetching from API:', error);
+      try {
+        showSpinner();
+        const response = await fetch('https://sitoform.com/data/artworks.json');
+        const fallbackData = await response.json();
+        if (fallbackData.length === 0) {
+          artworkDisplay.innerHTML = '<p>No artworks found (fallback).</p>';
+          hideSpinner();
+          hideProgress();
+          return;
+        }
+        artworks = fallbackData.map((artwork, index) => ({
+          number: index + 1,
+          project: artwork.project,
+          year: artwork.year,
+          type: artwork.type,
+          description: artwork.description,
+          imageurl: artwork.imageurl
+        }));
+        totalArtworks.textContent = `${artworks.length}`;
+        artworkSlider.max = artworks.length;
+        artworkSlider.value = 1;
+        currentIndex = 0;
+        loadImageWithProgress(artworks[currentIndex].imageurl || 'https://via.placeholder.com/300?text=No+Image', () => {
+          updateArtwork();
+          preloadImages();
+        });
+      } catch (fallbackError) {
+        console.error('Error fetching fallback artworks.json:', fallbackError);
+        artworkDisplay.innerHTML = '<p>Error loading artworks.</p>';
+        hideSpinner();
+        hideProgress();
+      }
+    }
+  }
+
+  // Ensure DOM is ready before initial load
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded: Initializing toggleContent');
+    toggleContent();
+    if (new URLSearchParams(window.location.search).get('page') === '') {
+      fetchArtworks();
+    }
+  });
+</script>
+</body>
+</html>

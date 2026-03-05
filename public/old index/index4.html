@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Portfolio</title>
+  <!-- Load the local Tailwind CSS file -->
+  <link href="/css/output.css" rel="stylesheet">
+  <!-- Inter Font from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #343333;
+      color: white;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .artwork-section {
+      background-color: #343333;
+      height: 1060px;
+      width: 100%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .artwork-display img {
+      max-width: 100%;
+      max-height: 80vh;
+      object-fit: contain;
+    }
+    .blue-line {
+      height: 3px;
+      background-color: #009FE3;
+      width: 1000px;
+      position: absolute;
+      bottom: -3px; /* Adjusted to ensure visibility below header */
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100; /* Increased to avoid overlap */
+    }
+    .vertical-line {
+      width: 2px;
+      height: 26px;
+      background-color: white;
+    }
+    .short-vertical-line {
+      width: 2px;
+      height: 30px;
+      background-color: white;
+      margin-right: 10px;
+    }
+    .metadata-section {
+      display: flex;
+      align-items: flex-start;
+    }
+    .metadata-item {
+      position: relative;
+    }
+    .number-align {
+      display: flex;
+      align-items: flex-end;
+      height: 26px;
+      margin-top: -12px;
+      margin-right: -5px;
+    }
+    .description-table {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      padding-left: 36px;
+    }
+    .description-table div {
+      flex: 1;
+    }
+    .description-table div:last-child {
+      margin-left: -12px;
+    }
+    /* Font Group CSS Classes */
+    .owner {
+      font-size: 14px;
+      font-weight: 700;
+      color: #575756;
+      line-height: 1;
+    }
+    .ownersub1 {
+      font-size: 14px;
+      font-weight: 300;
+      color: #575756;
+      line-height: 1;
+    }
+    .ownersub2 {
+      font-size: 14px;
+      font-weight: 200;
+      color: #575756;
+      line-height: 1;
+    }
+    .headerlinks {
+      font-size: 14px;
+      font-weight: 200;
+      color: white;
+    }
+    .artlink {
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+    }
+    .category {
+      font-size: 12px;
+      font-weight: 200;
+      line-height: 1;
+      margin-bottom: 7px;
+    }
+    .projectdata {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+      color: white;
+    }
+    .description {
+      font-size: 14px;
+      font-weight: 300;
+      line-height: 1.5;
+      max-width: 433px;
+      color: white;
+    }
+    #description {
+      column-count: 2;
+      column-gap: 20px;
+      column-fill: auto;
+      height: auto;
+      max-height: 200px;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 300;
+      color: white;
+      margin-top: 20px;
+      padding-left: 36px;
+    }
+    #total-artworks {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+      color: white;
+    }
+    /* Header-specific styles */
+    header {
+      overflow: visible;
+      position: relative;
+    }
+    .header-content {
+      position: relative;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+      min-height: 133px; /* Ensure enough height for blue-line */
+    }
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .blue-line {
+        width: 90%;
+        bottom: -3px; /* Maintain visibility */
+        z-index: 100;
+      }
+      .header-content {
+        padding: 0 10px;
+      }
+      .logo {
+        width: 150px;
+        height: auto;
+      }
+      .header-text {
+        left: 200px !important;
+        font-size: 12px;
+      }
+      .nav-links {
+        left: 200px !important;
+        top: 60px !important;
+        font-size: 12px;
+      }
+      .art-link {
+        right: 10px !important;
+        font-size: 12px;
+      }
+      .metadata-section {
+        flex-direction: column;
+        padding: 0 10px;
+      }
+      .metadata-item {
+        width: 100% !important;
+        max-width: none !important;
+        margin-bottom: 20px;
+      }
+      .vertical-line {
+        display: none;
+      }
+      .description-table {
+        flex-direction: column;
+      }
+      .description-table div:last-child {
+        margin-left: 0;
+      }
+      .artwork-section {
+        height: 500px;
+      }
+      .artwork-display img {
+        max-height: 50vh;
+      }
+      .swipe-btn {
+        font-size: 1.5rem;
+      }
+      .owner, .ownersub1, .ownersub2, .headerlinks, .artlink, .projectdata, .description {
+        font-size: 12px;
+      }
+      .category {
+        font-size: 10px;
+      }
+      #description {
+        column-count: 1;
+      }
+      #total-artworks {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Section -->
+  <header class="w-full h-[133px] bg-[#343333] overflow-visible relative">
+    <div class="header-content max-w-[1000px] mx-auto relative">
+      <div class="logo absolute left-[40px] top-[18px]">
+        <img src="https://sitoform.com/logo/sito+RDA_logo01" alt="Logo" class="w-[210px] h-[75px]" />
+      </div>
+      <div class="header-text absolute left-[278px] top-[15px] leading-tight">
+        <p class="owner">SITO SCHWARZENBERGER</p>
+        <p class="ownersub1">RADIKAL DESIGN</p>
+        <p class="ownersub2">ALLIANCE</p>
+      </div>
+      <nav class="nav-links absolute left-[278px] top-[76px] flex space-x-2">
+        <a href="#" class="headerlinks hover:underline">BIOGRAPHY</a>
+        <a href="#" class="headerlinks hover:underline">CONTACT</a>
+        <a href="#" class="headerlinks hover:underline">VISUALS</a>
+      </nav>
+      <a href="#" class="art-link absolute right-[50px] top-[15px] artlink hover:underline">> ART</a>
+      <div class="blue-line"></div>
+    </div>
+  </header>
+
+  <!-- Metadata Section -->
+  <section class="w-full py-4 bg-[#343333]">
+    <div class="max-w-[1000px] mx-auto">
+      <!-- Metadata Row (4 columns including total) -->
+      <div class="metadata-section flex items-start">
+        <!-- Total Artworks -->
+        <div class="metadata-item w-[100px] text-right">
+          <p class="category invisible">TOTAL</p>
+          <div class="number-align">
+            <p id="total-artworks" class="projectdata">Total: 0</p>
+          </div>
+        </div>
+        <!-- Number -->
+        <div class="metadata-item w-[36px] text-right">
+          <p class="category invisible">PROJECT</p>
+          <div class="number-align">
+            <p id="artwork-number" class="projectdata"></p>
+          </div>
+        </div>
+        <!-- Project -->
+        <div class="metadata-item flex-1 mr-[110px]">
+          <div class="metadata-group">
+            <div class="short-vertical-line mt-[2px]"></div>
+            <div>
+              <p class="category">PROJECT</p>
+              <p id="artwork-title" class="projectdata"></p>
+            </div>
+          </div>
+        </div>
+        <!-- Year -->
+        <div class="metadata-item w-[243px] mr-[110px]">
+          <div class="metadata-group">
+            <div class="short-vertical-line mt-[2px]"></div>
+            <div>
+              <p class="category">YEAR</p>
+              <p id="artwork-year" class="projectdata"></p>
+            </div>
+          </div>
+        </div>
+        <!-- Type -->
+        <div class="metadata-item w-[243px]">
+          <div class="metadata-group">
+            <div class="short-vertical-line mt-[2px]"></div>
+            <div>
+              <p class="category">TYPE</p>
+              <p id="artwork-type" class="projectdata"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Description -->
+      <div id="description"></div>
+    </div>
+  </section>
+
+  <!-- Artwork Section -->
+  <section class="artwork-section">
+    <div class="max-w-[1000px] mx-auto text-center">
+      <div id="artwork-display" class="artwork-display">
+        <img src="" alt="Artwork" />
+      </div>
+      <!-- Swipe Controls -->
+      <button id="swipe-left" class="swipe-btn absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-2xl" disabled><</button>
+      <button id="swipe-right" class="swipe-btn absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-2xl">></button>
+    </div>
+  </section>
+
+  <!-- JavaScript for Swipe Functionality -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    let artworks = [];
+    let currentIndex = 0;
+    let typingTimeout = null;
+
+    // DOM elements
+    const totalArtworks = document.getElementById('total-artworks');
+    const artworkNumber = document.getElementById('artwork-number');
+    const artworkTitle = document.getElementById('artwork-title');
+    const artworkYear = document.getElementById('artwork-year');
+    const artworkType = document.getElementById('artwork-type');
+    const description = document.getElementById('description');
+    const artworkDisplay = document.getElementById('artwork-display');
+    const swipeLeftBtn = document.getElementById('swipe-left');
+    const swipeRightBtn = document.getElementById('swipe-right');
+
+    // Supabase client (not used directly since we use API)
+    const supabaseUrl = 'https://ydfkrwjafnuvdvezpkcp.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkZmtyd2phZm51dmR2ZXpwa2NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxNzA0MTUsImV4cCI6MjA2MDc0NjQxNX0.kHzI8KRGFBRrLpFVvJfK2JP_P2a9nRJzDBm5h235eJw';
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Typewriter effect function
+    function typeWriter(element, text, speed = 100, callback) {
+      element.textContent = '';
+      let i = 0;
+      function type() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          typingTimeout = setTimeout(type, speed);
+        } else if (callback) {
+          callback();
+        }
+      }
+      type();
+    }
+
+    // Stop ongoing typing animations
+    function stopTyping() {
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+        typingTimeout = null;
+      }
+      [totalArtworks, artworkNumber, artworkTitle, artworkYear, artworkType, description].forEach(el => {
+        el.textContent = '';
+      });
+    }
+
+    // Update UI with current artwork
+    function updateArtwork() {
+      stopTyping();
+      const currentArtwork = artworks[currentIndex];
+
+      // Apply typewriter effect to projectdata elements
+      typeWriter(totalArtworks, `Total: ${artworks.length}`, 100);
+      typeWriter(artworkNumber, `#${currentIndex + 1}`, 100, () => {
+        typeWriter(artworkTitle, currentArtwork.project || 'N/A', 100, () => {
+          typeWriter(artworkYear, currentArtwork.year || 'N/A', 100, () => {
+            typeWriter(artworkType, currentArtwork.type || 'N/A', 100, () => {
+              typeWriter(description, currentArtwork.description || 'No description available', 50);
+            });
+          });
+        });
+      });
+
+      // Update image
+      const artworkImage = artworkDisplay.querySelector('img');
+      const imageSrc = currentArtwork.imageurl || 'https://via.placeholder.com/300?text=No+Image';
+      artworkImage.src = imageSrc;
+      artworkImage.alt = currentArtwork.project || 'Artwork';
+
+      // Update button states
+      swipeLeftBtn.disabled = currentIndex === 0;
+      swipeRightBtn.disabled = currentIndex === artworks.length - 1;
+    }
+
+    // Fetch artworks from API
+    async function fetchArtworks() {
+      try {
+        const response = await fetch('https://sitoform25.onrender.com/api/artworks');
+        if (!response.ok) throw new Error('Failed to fetch artworks');
+        artworks = await response.json();
+
+        if (artworks.length === 0) {
+          artworkDisplay.innerHTML = '<p>No artworks found.</p>';
+          return;
+        }
+
+        artworks = artworks.map((artwork, index) => ({
+          number: index + 1,
+          project: artwork.project,
+          year: artwork.year,
+          type: artwork.type,
+          description: artwork.description,
+          imageurl: artwork.imageurl
+        }));
+
+        totalArtworks.textContent = `Total: ${artworks.length}`;
+        currentIndex = 0;
+        updateArtwork();
+      } catch (error) {
+        console.error('Error fetching from API:', error);
+        // Fallback to artworks.json
+        try {
+          const response = await fetch('https://sitoform.com/data/artworks.json');
+          const fallbackData = await response.json();
+
+          if (fallbackData.length === 0) {
+            artworkDisplay.innerHTML = '<p>No artworks found (fallback).</p>';
+            return;
+          }
+
+          artworks = fallbackData.map((artwork, index) => ({
+            number: index + 1,
+            project: artwork.project,
+            year: artwork.year,
+            type: artwork.type,
+            description: artwork.description,
+            imageurl: artwork.imageurl
+          }));
+
+          totalArtworks.textContent = `Total: ${artworks.length}`;
+          currentIndex = 0;
+          updateArtwork();
+        } catch (fallbackError) {
+          console.error('Error fetching fallback artworks.json:', fallbackError);
+          artworkDisplay.innerHTML = '<p>Error loading artworks.</p>';
+        }
+      }
+    }
+
+    // Swipe functionality
+    swipeLeftBtn.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateArtwork();
+      }
+    });
+
+    swipeRightBtn.addEventListener('click', () => {
+      if (currentIndex < artworks.length - 1) {
+        currentIndex++;
+        updateArtwork();
+      }
+    });
+
+    // Fetch and render artworks on page load
+    fetchArtworks();
+  </script>
+</body>
+</html>
