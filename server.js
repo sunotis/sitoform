@@ -20,12 +20,13 @@ app.use((req, res, next) => {
 
 const supabaseUrl = 'https://ydfkrwjafnuvdvezpkcp.supabase.co';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY;
-if (!supabaseKey) {
-  throw new Error('SUPABASE_SERVICE_ROLE_KEY or SUPABASE_KEY environment variable is not set');
-}
-const supabaseClient = createClient(supabaseUrl, supabaseKey, {
+const supabaseClient = supabaseKey ? createClient(supabaseUrl, supabaseKey, {
   auth: { autoRefreshToken: false, persistSession: false }
-});
+}) : null;
+
+if (!supabaseClient) {
+  console.warn('SUPABASE_SERVICE_ROLE_KEY or SUPABASE_KEY is not set; /api endpoints are disabled');
+}
 
 // Validate SFTP environment variables
 const requiredSftpVars = ['SFTP_HOST', 'SFTP_PORT', 'SFTP_USERNAME', 'SFTP_PASSWORD'];
@@ -33,6 +34,26 @@ const missingSftpVars = requiredSftpVars.filter(varName => !process.env[varName]
 if (missingSftpVars.length > 0) {
   console.error(`Missing SFTP environment variables: ${missingSftpVars.join(', ')}`);
 }
+
+app.get('/health', (req, res) => {
+  const missing = [];
+  if (!supabaseKey) missing.push('SUPABASE_SERVICE_ROLE_KEY|SUPABASE_KEY');
+  missing.push(...missingSftpVars);
+
+  const status = missing.length === 0 ? 'ok' : 'degraded';
+  res.status(status === 'ok' ? 200 : 503).json({
+    status,
+    timestamp: new Date().toISOString(),
+    missingEnv: missing
+  });
+});
+
+app.use('/api', (req, res, next) => {
+  if (!supabaseClient) {
+    return res.status(503).json({ error: 'Server misconfigured: missing SUPABASE_SERVICE_ROLE_KEY or SUPABASE_KEY' });
+  }
+  next();
+});
 
 app.get('/api/artworks', async (req, res) => {
   try {
